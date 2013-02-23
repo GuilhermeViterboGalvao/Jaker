@@ -14,8 +14,47 @@ import com.br.jaker.model.Book;
 
 public class JSONBookParser {
 
+	/**
+	 * @param InputStream jsonBook.
+	 * @return A object Book with the values read in 'in'.
+	 * @exception If the 'jsonBook' is null or not in the standards, the exception will occur.
+	 * <blockquote>
+	 * //Exemple of jsonBook
+	 * {
+	 *	    "title": "Jaker Example", //Required
+	 *	    "authors": [ 
+	 *	    	{
+	 *	    		"name" : "Guilherme Viterbo Galvao",
+	 *	    		"link" : "http://facebook.com/GuilhermeViterboGalvao",
+	 *	    		"email": "catanduva.gvg@gmail.com"
+	 *			},
+	 *	    	{
+	 *	    		"name" : "Rafael Caetano Sobral da Silva",
+	 *	    		"link" : "http://facebook.com/RafaelCaetanoSobralDaSilva",
+ 	 *	    		"email": "rafael@waves.com"
+ 	 *			}		
+	 *		], //Required
+	 *	    "date": "2011-12-27", //Required
+	 *	    "jakerOptions": {
+	 *			"background": "#fff",
+	 *			"vertical-bounce": true,
+	 *			"indexHeight": 200,
+	 *			"backgroundImagePortrait": "images/background-portrait.png",
+	 *			"backgroundImageLandscape": "images/background-landscape.png",
+	 *			"pageNumbersColor": "#333"
+	 *		},
+	 *	    "contents": [
+	 *	        "Cover.html",
+	 *	        "Introduction.html",
+	 *	        "Interactivity.html",
+	 *	        "Structure_and_Columns.html",
+	 *	        "Maps.html"
+	 *     ] //Required
+	 *} 
+	 * </blockquote>
+	 * */
 	public static Book parseBook(InputStream in) throws BookExpection {		
-		if (in == null) throw new BookExpection("InputStream is null."); 
+		if (in == null) throw new BookExpection("The object 'in' is null."); 
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 		StringBuilder sb = new StringBuilder();
