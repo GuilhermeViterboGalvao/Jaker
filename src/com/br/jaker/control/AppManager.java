@@ -22,5 +22,6 @@ public class AppManager {
 		return JSONBookParser.parseBook(jsonBook);
 	}
 	
+	
 	//Criar o JSON parser de edtions.
 }
