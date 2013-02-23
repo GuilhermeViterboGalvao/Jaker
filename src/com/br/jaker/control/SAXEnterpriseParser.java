@@ -23,6 +23,21 @@ public class SAXEnterpriseParser extends DefaultHandler {
 	
 	private StringBuilder sb;	
 
+	/**
+	 * <pre>
+	 * <?xml version="1.0" encoding="utf-8"?>
+	 * <enterprise>
+	 *		<name>Laker Framework</name>
+	 *		<site>http://www.lakercompendium.com/</site>
+	 *		<urlJsonEdtions>${site}/${magazine}/${edtions.do}</urlJsonEdtions>
+	 *		<address country="" state="" city="" neighborhood="" street="" code="" others=""/>
+	 *		<manager name="" email=""/>
+	 * </enterprise>
+	 * </pre>
+	 * @param InputStream with the enterprise xml values.
+	 * @return A object Enterprise with the values read in 'xml' object.
+	 * @exception If the 'xml' is null or not in the standards, the exception will occur.
+	 * */
 	public static Enterprise parseEnterprise(InputStream xml) throws EnterpriseException {		
 		if (xml == null) throw new EnterpriseException("The object 'xml' is null.");
 		

@@ -15,14 +15,11 @@ import com.br.jaker.model.Book;
 public class JSONBookParser {
 
 	/**
-	 * @param InputStream jsonBook.
-	 * @return A object Book with the values read in 'in'.
-	 * @exception If the 'jsonBook' is null or not in the standards, the exception will occur.
-	 * <blockquote>
-	 * //Exemple of jsonBook
+	 * <pre>
+	 * <h1>Exemple of jsonBook</h1>
 	 * {
-	 *	    "title": "Jaker Example", //Required
-	 *	    "authors": [ 
+	 * 		"title": "Jaker Example", //Required
+	 *	    "authors": [
 	 *	    	{
 	 *	    		"name" : "Guilherme Viterbo Galvao",
 	 *	    		"link" : "http://facebook.com/GuilhermeViterboGalvao",
@@ -32,7 +29,7 @@ public class JSONBookParser {
 	 *	    		"name" : "Rafael Caetano Sobral da Silva",
 	 *	    		"link" : "http://facebook.com/RafaelCaetanoSobralDaSilva",
  	 *	    		"email": "rafael@waves.com"
- 	 *			}		
+ 	 *			}
 	 *		], //Required
 	 *	    "date": "2011-12-27", //Required
 	 *	    "jakerOptions": {
@@ -50,8 +47,11 @@ public class JSONBookParser {
 	 *	        "Structure_and_Columns.html",
 	 *	        "Maps.html"
 	 *     ] //Required
-	 *} 
-	 * </blockquote>
+	 * }
+	 * </pre>
+	 * @param InputStream 'in'.
+	 * @return A object Book with the values read in 'in'.
+	 * @exception If the 'jsonBook' is null or not in the standards, the exception will occur.
 	 * */
 	public static Book parseBook(InputStream in) throws BookExpection {		
 		if (in == null) throw new BookExpection("The object 'in' is null."); 

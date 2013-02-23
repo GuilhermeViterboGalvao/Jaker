@@ -12,6 +12,20 @@ import android.util.Log;
 
 public class JSONContentsParser {
 	
+	/**
+	 * <pre>
+	 *	    "contents": [
+	 *	        "Cover.html",
+	 *	        "Introduction.html",
+	 *	        "Interactivity.html",
+	 *	        "Structure_and_Columns.html",
+	 *	        "Maps.html"
+	 *     ]
+	 * </pre>
+	 * @param InputStream 'jsonBook'.
+	 * @return A list of objects String with the values read in 'jsonBook'.
+	 * @exception If the 'jsonBook' is null or not in the standards, the exception will occur.
+	 * */
 	public static List<String> parseContents(JSONObject jsonBook) throws ContentsException {
 		if (jsonBook == null) throw new ContentsException("The object 'jsonBook' is null.");		
 		

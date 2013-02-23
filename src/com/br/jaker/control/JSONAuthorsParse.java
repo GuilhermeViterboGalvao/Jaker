@@ -11,6 +11,25 @@ import com.br.jaker.model.Author;
 
 public class JSONAuthorsParse {
 
+	/**
+	 * <pre>
+	 *	    "authors": [
+	 *	    	{
+	 *	    		"name" : "Guilherme Viterbo Galvao",
+	 *	    		"link" : "http://facebook.com/GuilhermeViterboGalvao",
+	 *	    		"email": "catanduva.gvg@gmail.com"
+	 *			},
+	 *	    	{
+	 *	    		"name" : "Rafael Caetano Sobral da Silva",
+	 *	    		"link" : "http://facebook.com/RafaelCaetanoSobralDaSilva",
+ 	 *	    		"email": "rafael@waves.com"
+ 	 *			}
+	 *		]
+	 * </pre>
+	 * @param InputStream 'jsonBook'.
+	 * @return A list of objects Authors with the values read in 'jsonBook'.
+	 * @exception If the 'jsonBook' is null or not in the standards, the exception will occur.
+	 * */
 	public static List<Author> parseAuthors(JSONObject jsonBook) throws AuthorsException {		
 		if (jsonBook == null) throw new AuthorsException("The object 'jsonBook' is null.");
 		

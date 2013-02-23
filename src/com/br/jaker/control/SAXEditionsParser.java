@@ -25,6 +25,40 @@ public class SAXEditionsParser extends DefaultHandler {
 	
 	private StringBuilder sb;
 	
+	/**
+	 * <pre>
+	 *	<?xml version="1.0" encoding="utf-8"?>
+	 *	<editions>
+	 *		<edition>
+	 *			<new>false</new>
+	 *			<number>1</number>
+	 *			<title>Laker - 1</title>
+	 * 			<description>Laker - 1</description>
+	 *			<coverImage>http://www.lakercompendium.com/magazines/laker1.jpg</coverImage>
+	 *			<downloadUrl>www.lakercompendium.com/downloads/laker-starter-pack-1.4.2.zip</downloadUrl>
+	 *		</edition>
+	 * 		<edition>
+	 *			<new>false</new>
+	 *			<number>2</number>
+	 *			<title>Laker - 2</title>
+	 *			<description>Laker - 2</description>
+	 *			<coverImage>http://www.lakercompendium.com/magazines/laker2.jpg</coverImage>
+	 *			<downloadUrl>www.lakercompendium.com/downloads/laker-starter-pack-1.4.2.zip</downloadUrl>
+	 *		</edition>
+	 *		<edition>
+	 *			<new>true</new>
+	 *			<number>3</number>
+	 * 			<title>Laker - 3</title>
+	 *			<description>Laker - 3</description>
+	 *			<coverImage>http://www.lakercompendium.com/magazines/laker3.jpg</coverImage>
+	 *			<downloadUrl>www.lakercompendium.com/downloads/laker-starter-pack-1.4.2.zip</downloadUrl>
+	 *		</edition>
+	 * </editions>
+	 * </pre>
+	 * @param InputStream with the editions xml values.
+	 * @return A list of objects Edition with the values read in 'xml' object.
+	 * @exception If the 'xml' is null or not in the standards, the exception will occur.
+	 * */
 	public static List<Edition> parseEdition(InputStream xml) throws EditionException {
 		if (xml == null) throw new EditionException("The object 'xml' is null.");
 		

@@ -8,6 +8,21 @@ import com.br.jaker.model.JakerOptions;
 
 public class JSONJakerOptionsParser {
 
+	/**
+	 * <pre>
+	 *	    "jakerOptions": {
+	 *			"background": "#fff",
+	 *			"vertical-bounce": true,
+	 *			"indexHeight": 200,
+	 *			"backgroundImagePortrait": "images/background-portrait.png",
+	 *			"backgroundImageLandscape": "images/background-landscape.png",
+	 *			"pageNumbersColor": "#333"
+	 *		}
+	 * </pre>
+	 * @param InputStream 'jsonBook'.
+	 * @return A object JakerOptions with the values read in 'jsonBook'.
+	 * @exception If the 'jsonBook' is null or not in the standards, the exception will occur.
+	 * */
 	public static JakerOptions parseJakerOptions(JSONObject jsonBook) throws JakerOptionsException {
 		if (jsonBook == null) throw new JakerOptionsException("The object 'jsonBook' is null.");
 		
