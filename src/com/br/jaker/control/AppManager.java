@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
@@ -16,27 +15,19 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.AbstractHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-
 import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.util.Log;
-
 import com.br.jaker.exception.BookExpection;
 import com.br.jaker.exception.EditionException;
 import com.br.jaker.exception.EnterpriseException;
 import com.br.jaker.model.Book;
 import com.br.jaker.model.Edition;
 import com.br.jaker.model.Enterprise;
+import com.br.jaker.util.Utils;
 
 public class AppManager {
-	
-	private HttpGet requestGet;
-	
-	private HttpPost requestPost;
-	
-	private HttpResponse response;
 	
 	private HttpClient httpClient;
 	
@@ -46,7 +37,7 @@ public class AppManager {
 	
 	private List<Book> books;
 	
-	private File rootPath;	
+	private File rootPath;
 	
 	public AppManager(HttpClient httpClient, AssetManager assetManager, File rootPath) throws EnterpriseException, IOException, EditionException, BookExpection {
 		this.httpClient = httpClient;
@@ -57,7 +48,7 @@ public class AppManager {
 			editions = SAXEditionsParser.parseEdition(doGet(enterprise.getUrlJsonEdtions()));
 			books = new ArrayList<Book>(editions.size());
 			
-			this.rootPath = new File(rootPath, "jaker/" + enterprise.getName());
+			this.rootPath = new File(rootPath, enterprise.getName());
 			if (!this.rootPath.exists()) this.rootPath.mkdirs();
 			
 			File[] booksPaths = this.rootPath.listFiles();
@@ -70,20 +61,74 @@ public class AppManager {
 				}
 			}
 			
-			//Verificar no diretório pricipal/nomedarevista os arquivos que lá tem.
-			//Depois baixar os que são novos.
+			for (Edition edition : editions) {
+				if (edition.isNewEdition()) {
+					boolean hasBook = false;
+					for (Book book : books) {
+						if (edition.getTitle().equals(book.getTitle())) {
+							hasBook = true;
+							break;
+						}
+					}
+					if (!hasBook) new AsyncEditionDownloader().execute(edition);
+				}
+			}
 		}
 	}
 	
-	public Book getBook(InputStream jsonBook) throws BookExpection {
-		return JSONBookParser.parseBook(jsonBook);
+	//TODO O unzip deve criar um diretório com o Título da edição em questão.
+	public class AsyncEditionDownloader extends AsyncTask<Edition, Void, Book> {
+
+		@Override
+		protected Book doInBackground(Edition... editions) {
+			try {
+				Utils.unzip(Utils.writeZipInputStream(doGet(editions[0].getDownloadUrl()), new File(rootPath, editions[0].getNumber() + ".zip")) , rootPath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Book book = null;
+			try {
+				book = JSONBookParser.parseBook(new FileInputStream(new File(rootPath, editions[0].getTitle() + "/book.json")));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return book;
+		}
+		
+		@Override
+		protected void onCancelled() {
+			super.onCancelled();
+		}
+		
+		@Override
+		protected void onPostExecute(Book book) {
+			books.add(book);
+		}		
 	}
-	
+
+	public Enterprise getEnterprise() {
+		return enterprise;
+	}
+
+	public List<Edition> getEditions() {
+		return editions;
+	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public File getRootPath() {
+		return rootPath;
+	}
+
 	public synchronized InputStream doGet(String url) {
 		Log.i("AppManager.doGet", "url: " + url);
 		
-		requestGet = new HttpGet(url);
+		HttpGet requestGet = new HttpGet(url);
 		requestGet.setHeader("Accept", "text/plain");
+		
+		HttpResponse response = null;
 		
 		try {
 			response = httpClient.execute(requestGet);
@@ -132,11 +177,11 @@ public class AppManager {
 	public synchronized InputStream doPost(String url, String[] names, String[] values) {
 		Log.i("AppManager.doPost", "url: " + url);
 		
-		requestPost = new HttpPost(url);
+		HttpPost requestPost = new HttpPost(url);
 		requestPost.setHeader("Accept", "text/plain");
 		
 		InputStream in = null;
-		
+				
 		if (values != null && names != null && values.length == names.length) {
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(values.length);
 			
@@ -151,6 +196,8 @@ public class AppManager {
 			} catch (Exception e) {
 				Log.e("AppManager.doPost", "Error on 'requestPost.setEntity(new UrlEncodedFormEntity(nameValuePairs))': " + e.getMessage(), e);
 			}
+	        
+	        HttpResponse response = null;
 	        
 			try {
 				response = httpClient.execute(requestPost);

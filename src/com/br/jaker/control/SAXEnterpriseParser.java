@@ -24,6 +24,7 @@ public class SAXEnterpriseParser extends DefaultHandler {
 	private StringBuilder sb;	
 
 	/**
+	 * <code>
 	 * <pre>
 	 * <?xml version="1.0" encoding="utf-8"?>
 	 * <enterprise>
@@ -32,8 +33,9 @@ public class SAXEnterpriseParser extends DefaultHandler {
 	 *		<urlJsonEdtions>${site}/${magazine}/${edtions.do}</urlJsonEdtions>
 	 *		<address country="" state="" city="" neighborhood="" street="" code="" others=""/>
 	 *		<manager name="" email=""/>
-	 * </enterprise>
+	 * </enterprise> 
 	 * </pre>
+	 * </code>
 	 * @param InputStream with the enterprise xml values.
 	 * @return A object Enterprise with the values read in 'xml' object.
 	 * @exception If the 'xml' is null or not in the standards, the exception will occur.

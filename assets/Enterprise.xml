@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <enterprise>
-	<name>Laker Framework</name>
-	<site>http://www.lakercompendium.com/</site>
-	<urlJsonEdtions>${site}/${magazine}/${edtions.do}</urlJsonEdtions>
+	<name>Fluir</name>
+	<site>http://fluir.terra.com.br/</site>
+	<urlJsonEdtions>http://waves.terra.com.br/fluir/editions.json</urlJsonEdtions>
 	<address country="" state="" city="" neighborhood="" street="" code="" others=""/>
 	<manager name="" email=""/>
 </enterprise>

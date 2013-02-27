@@ -1,8 +1,6 @@
 package com.br.jaker.view;
 
 import java.io.IOException;
-import java.util.List;
-
 import org.apache.http.NoHttpResponseException;
 import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -17,11 +15,9 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
-
 import com.br.jaker.control.AppManager;
 import com.br.jaker.exception.EditionException;
 import com.br.jaker.exception.EnterpriseException;
-import com.br.jaker.model.Book;
 import android.app.Application;
 import android.os.Environment;
 import android.util.Log;
@@ -66,26 +62,20 @@ public class JakerApp extends Application {
 		return appManager;
 	}
 	
-	private List<Book> book;
-	
-	public List<Book> getBook() {
-		return book;
-	}
-	
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		
 		try {
 			appManager = new AppManager(httpClient, getAssets(), Environment.getExternalStorageDirectory());
-		} catch (EnterpriseException e) {
-			
-		} catch (EditionException e) {
-			
-		} catch (IOException e) {
-
+		} catch (EnterpriseException ente) {
+			Log.e("JakerApp.onCreate", "Problem on create AppManager: " + ente.getMessage(), ente);
+		} catch (EditionException edte) {
+			Log.e("JakerApp.onCreate", "Problem on create AppManager: " + edte.getMessage(), edte);
+		} catch (IOException ioe) {
+			Log.e("JakerApp.onCreate", "Problem on create AppManager: " + ioe.getMessage(), ioe);
 		} catch (Exception e) {
-
+			Log.e("JakerApp.onCreate", "Problem on create AppManager: " + e.getMessage(), e);
 		}
 	}
 }
