@@ -133,5 +133,6 @@ public class SAXEditionsParser extends DefaultHandler {
 		} else if ("edition".equals(localName)) {
 			editions.add(edition);
 		}
+		sb.setLength(0);
 	}	
 }

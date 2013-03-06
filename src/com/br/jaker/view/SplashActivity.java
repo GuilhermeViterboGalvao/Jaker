@@ -87,8 +87,7 @@ public class SplashActivity extends Activity {
 				}
 				if (!hasBook) new AsyncBookDownloader().execute(edition);
 			}
-		}
-		proceed();
+		}		
 	}
 	
 	private void proceed() {
@@ -120,7 +119,7 @@ public class SplashActivity extends Activity {
 				errorMessage = "";
 			} else {
 				errorMessage = Messages.notConnected;
-				showAlertDialog();
+				cancel(true);
 			}			
 		}
 		
@@ -139,7 +138,7 @@ public class SplashActivity extends Activity {
 					Log.e("JakerApp.AsyncEditionsDownloader.doInBackground", "Problem on \"SAXEditionsParser.parseEdition(doGet(url))\": " + e.getMessage(), e);
 					errorMessage = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
 				} finally {
-					if (editions == null) {
+					if (editions == null && errorMessage != null && errorMessage.equals("")) {
 						errorMessage = "The " + jakerApp.getAppName() + " app stopped working!";
 					}
 				}
@@ -181,10 +180,29 @@ public class SplashActivity extends Activity {
 	/***********************************************************************************************************************************************/
 	
 	/***********************************************************************************************************************************************/
-	public class AsyncBookDownloader extends AsyncTask<Edition, Void, Book> {
+	public class AsyncBookDownloader extends AsyncTask<Edition, Integer, Book> {
 
+		private ProgressDialog progressDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			progressDialog = new ProgressDialog(SplashActivity.this);
+			progressDialog.setTitle(jakerApp.getAppName());
+			progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if (!AsyncBookDownloader.this.isCancelled()) AsyncBookDownloader.this.cancel(true);
+				}
+			});
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			progressDialog.show();
+		}
+		
 		@Override
 		protected Book doInBackground(Edition... editions) {
+			//Olhar
+			//http://stackoverflow.com/questions/3028306/download-a-file-with-android-and-showing-the-progress-in-a-progressdialog
+			
 			try {
 				Utils.unzip(Utils.writeZipInputStream(Utils.doGet(editions[0].getDownloadUrl()), new File(jakerApp.getRootPath(), editions[0].getNumber() + ".zip")) , jakerApp.getRootPath());
 			} catch (IOException e) {
@@ -200,13 +218,23 @@ public class SplashActivity extends Activity {
 		}
 		
 		@Override
+		protected void onProgressUpdate(Integer... values) {
+			if (values.length == 2) {
+				progressDialog.setMax(values[1]);
+				progressDialog.setProgress(values[0]);
+			}
+		}
+		
+		@Override
 		protected void onCancelled() {
 			super.onCancelled();
 		}
 		
 		@Override
 		protected void onPostExecute(Book book) {
+			if (progressDialog.isShowing()) progressDialog.dismiss();
 			jakerApp.getBooks().add(book);
+			proceed();
 		}		
 	}
 	/***********************************************************************************************************************************************/

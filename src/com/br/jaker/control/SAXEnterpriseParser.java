@@ -123,9 +123,9 @@ public class SAXEnterpriseParser extends DefaultHandler {
 			enterprise = new Enterprise();
 			enterprise.setName(sb.toString().trim());
 		} else if ("site".equals(localName)) {
-			enterprise.setName(sb.toString().trim());
+			enterprise.setSite(sb.toString().trim());
 		} else if ("urlJsonEdtions".equals(localName)) {
-			enterprise.setName(sb.toString().trim());
+			enterprise.setUrlJsonEdtions(sb.toString().trim());
 		}
 		sb.setLength(0);
 	}	

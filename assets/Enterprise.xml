@@ -2,7 +2,7 @@
 <enterprise>
 	<name>Fluir</name>
 	<site>http://fluir.terra.com.br/</site>
-	<urlJsonEdtions>http://waves.terra.com.br/fluir/editions.json</urlJsonEdtions>
+	<urlJsonEdtions>http://waves.terra.com.br/fluir/editions.xml</urlJsonEdtions>
 	<address country="" state="" city="" neighborhood="" street="" code="" others=""/>
 	<manager name="" email=""/>
 </enterprise>
