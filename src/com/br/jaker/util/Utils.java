@@ -70,6 +70,10 @@ public class Utils {
 		httpClient.setHttpRequestRetryHandler(retryHandler);
 	}
 	
+	public static AbstractHttpClient getHTTPClient() {
+		return httpClient;
+	}
+	
 	public static synchronized InputStream doGet(String url) {
 		Log.i("Utils.doGet", "url: " + url);
 		
@@ -187,7 +191,7 @@ public class Utils {
 		return in;
 	}
 	
-	public static File writeZipInputStream(InputStream zip, File dir) {
+	public static File writeZip(InputStream zip, File dir) {
 		OutputStream out = null;
 		try {
 			out = new FileOutputStream(dir);

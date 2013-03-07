@@ -1,11 +1,21 @@
 package com.br.jaker.view;
 
+import java.io.BufferedInputStream; 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+
 import com.br.jaker.control.JSONBookParser;
 import com.br.jaker.control.SAXEditionsParser;
 import com.br.jaker.control.SAXEnterpriseParser;
@@ -26,6 +36,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+//TODO 
+/*
+ * Quando cancelar o Download excluir o arquivo .zip;
+ * Após extrair o arquivo remover o .zip;
+ * Só fazer o download caso seja novo;
+ * Problema no JSONParser dos Book. Problema no formato da data (2013-09-08);
+ * */
 public class SplashActivity extends Activity {
 
 	private JakerApp jakerApp;
@@ -200,28 +217,86 @@ public class SplashActivity extends Activity {
 		
 		@Override
 		protected Book doInBackground(Edition... editions) {
-			//Olhar
-			//http://stackoverflow.com/questions/3028306/download-a-file-with-android-and-showing-the-progress-in-a-progressdialog
+			Edition edition = editions[0];
 			
-			try {
-				Utils.unzip(Utils.writeZipInputStream(Utils.doGet(editions[0].getDownloadUrl()), new File(jakerApp.getRootPath(), editions[0].getNumber() + ".zip")) , jakerApp.getRootPath());
-			} catch (IOException e) {
-				//TODO
+			if (edition != null) {				
+				HttpGet requestGet = new HttpGet(edition.getDownloadUrl());
+				requestGet.setHeader("Accept", "text/plain");
+				
+				HttpResponse response = null;				
+				try {
+					response = Utils.getHTTPClient().execute(requestGet);
+				} catch (ClientProtocolException cpe) {
+					Log.i("SplashActivity.AsyncBookDownloader.doInBackground", "Execution stoped: " + cpe.getMessage());
+					return null;
+				} catch (IOException ioe) {
+					Log.i("SplashActivity.AsyncBookDownloader.doInBackground", "Execution stoped: " + ioe.getMessage());
+					return null;
+				} catch (Exception e) {
+					Log.i("SplashActivity.AsyncBookDownloader.doInBackground", "Execution stoped: " + e.getMessage());
+					return null;
+				}
+				
+				int statusCode = response.getStatusLine().getStatusCode();				
+				if (statusCode != HttpStatus.SC_OK) {
+					try {
+						response.getEntity().getContent().close();
+					} catch (IOException ioe) {
+						Log.i("SplashActivity.AsyncBookDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + ioe.getMessage());
+					} catch (Exception e) {
+						Log.i("SplashActivity.AsyncBookDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + e.getMessage());
+					}
+					return null;
+				}
+				
+				long fileSize  = response.getEntity().getContentLength();
+		        long totalRead = 0;        
+		        int read = 0;
+		        byte buffer[] = new byte[1024];
+		        InputStream in = null;
+		        OutputStream out = null;
+		        File zip = new File(jakerApp.getRootPath(), edition.getNumber() + ".zip");				
+				try {			
+		            in = new BufferedInputStream(response.getEntity().getContent());
+		            out = new FileOutputStream(zip);
+		            while ( ((read = in.read(buffer)) != -1) && !isCancelled() ) {
+		            	totalRead += read;                
+		                out.write(buffer, 0, read);
+		                publishProgress((int)fileSize, (int)(totalRead * 100 / fileSize));
+		            }
+				} catch (IllegalStateException ise) {
+					Log.e("SplashActivity.AsyncBookDownloader.doInBackground", ise.getMessage(), ise);
+				} catch (IOException ioe) {
+					Log.e("SplashActivity.AsyncBookDownloader.doInBackground", ioe.getMessage(), ioe);
+				} catch (Exception e) {
+					Log.e("SplashActivity.AsyncBookDownloader.doInBackground", e.getMessage(), e);
+				} finally {
+					if(in  != null) try { in.close();  } catch (Exception e) {}
+					if(out != null) try { out.close(); } catch (Exception e) {}
+				}
+				
+				try {
+					Utils.unzip(zip, jakerApp.getRootPath());
+				} catch (IOException e) {
+					//TODO
+				}
+				
+				Book book = null;
+				try {
+					book = JSONBookParser.parseBook(new FileInputStream(new File(jakerApp.getRootPath(), edition.getNumber() + "/book.json")));
+				} catch (Exception e) {
+					//TODO
+				}
+				return book;
 			}
-			Book book = null;
-			try {
-				book = JSONBookParser.parseBook(new FileInputStream(new File(jakerApp.getRootPath(), editions[0].getNumber() + "/book.json")));
-			} catch (Exception e) {
-				//TODO
-			}
-			return book;
+			return null;
 		}
 		
 		@Override
 		protected void onProgressUpdate(Integer... values) {
 			if (values.length == 2) {
-				progressDialog.setMax(values[1]);
-				progressDialog.setProgress(values[0]);
+				progressDialog.setMax(values[0]);
+				progressDialog.setProgress(values[1]);
 			}
 		}
 		
