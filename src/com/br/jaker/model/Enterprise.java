@@ -2,6 +2,10 @@ package com.br.jaker.model;
 
 import java.io.Serializable;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class Enterprise implements Serializable {
 	
 	private static final long serialVersionUID = 4940485209011527546L;

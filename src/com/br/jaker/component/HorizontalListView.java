@@ -8,6 +8,10 @@ import android.view.GestureDetector.OnGestureListener;
 import android.view.View.OnTouchListener;
 import android.widget.HorizontalScrollView;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class HorizontalListView extends HorizontalScrollView implements OnTouchListener, OnGestureListener {
 	
 	public HorizontalListView(Context context, int maxItem,	int itemWidth) {
@@ -26,14 +30,14 @@ public class HorizontalListView extends HorizontalScrollView implements OnTouchL
 	private static final int SWIPE_THRESHOLD_VELOCITY = 300;
 	private static final int SWIPE_MIN_DISTANCE = 240;
 	private GestureDetector gestureDetector;
-	private int scrollTo = 0;
-	private int maxItem = 0;
-	private int activeItem = 0;
+	private boolean flingDisable = true;
 	private float prevScrollX = 0;
 	private boolean start = true;
-	private int itemWidth = 0;
 	private float currentScrollX;
-	private boolean flingDisable = true;	
+	private int activeItem = 0;
+	private int itemWidth = 0;
+	private int scrollTo = 0;
+	private int maxItem = 0;		
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
@@ -88,18 +92,19 @@ public class HorizontalListView extends HorizontalScrollView implements OnTouchL
 		return returnValue;
 	}
 
+	
 	@Override
-	public void onLongPress(MotionEvent event) { }
-
-	@Override
-	public void onShowPress(MotionEvent event) { }
-
-	@Override
-	public boolean onDown(MotionEvent e) { return false; }
+	public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) { return false; }
 	
 	@Override
 	public boolean onSingleTapUp(MotionEvent event) { return false; }
 	
 	@Override
-	public boolean onScroll(MotionEvent event1, MotionEvent event2, float distanceX, float distanceY) { return false; }
+	public boolean onDown(MotionEvent e) { return false; }
+	
+	@Override
+	public void onLongPress(MotionEvent event) { }
+
+	@Override
+	public void onShowPress(MotionEvent event) { }
 }

@@ -10,6 +10,10 @@ import com.br.jaker.exception.ContentsException;
 
 import android.util.Log;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class JSONContentsParser {
 	
 	/**

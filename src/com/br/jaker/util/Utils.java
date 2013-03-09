@@ -36,7 +36,11 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import android.util.Log;
 
-public class Utils {
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
+public final class Utils {
 	
 	private static final HttpRequestRetryHandler retryHandler;
 	
@@ -74,6 +78,11 @@ public class Utils {
 		return httpClient;
 	}
 	
+	/**
+	 * Execute the get method.
+	 * @param url - The url that should run the post method.
+	 * @return The contents of the response
+	 * */
 	public static synchronized InputStream doGet(String url) {
 		Log.i("Utils.doGet", "url: " + url);
 		
@@ -126,6 +135,13 @@ public class Utils {
 		return in;
 	}
 	
+	/**
+	 * Execute the post method with the parameters.
+	 * @param url - The url that should run the post method.
+	 * @param names - The names of the values.
+	 * @param values - The values of the names.
+	 * @return The contents of the response
+	 * */
 	public static synchronized InputStream doPost(String url, String[] names, String[] values) {
 		Log.i("Utils.doPost", "url: " + url);
 		
@@ -191,6 +207,11 @@ public class Utils {
 		return in;
 	}
 	
+	/**
+	 * This method creates a zip file in the directory reported by the "dir" parameter.
+	 * @param zip - The InputStream of zip file.
+	 * @param dir - The directory where the zip file will be created.
+	 * */
 	public static File writeZip(InputStream zip, File dir) {
 		OutputStream out = null;
 		try {
@@ -213,7 +234,12 @@ public class Utils {
 		return dir;
 	}
 	
-	//TODO Documentar método
+	/**
+	 * This method extracts the zip file in the directory informed by parameter "dir".
+	 * @param zipFile - The zip file.
+	 * @param dir - The directory where you extracted the zip file.
+	 * @exception If the file is not a zip or there is any problem in extracting the file this exception is thrown.
+	 * */
 	public static void unzip(File zipFile, File dir) throws IOException {
 		
 		ZipFile zip = null;
@@ -224,9 +250,9 @@ public class Utils {
 		
 		try {
 			
-			// cria diretório informado, caso não exista
+			// create directory informed if there is no
 			if (!dir.exists()) dir.mkdirs();
-			if (!dir.exists() || !dir.isDirectory()) throw new IOException("O diretório " + dir.getName() + " não é um diretório válido");
+			if (!dir.exists() || !dir.isDirectory()) throw new IOException("The directory " + dir.getName() + " is not a valid directory");
 			
 			zip = new ZipFile(zipFile);
 			Enumeration<? extends ZipEntry> entries = zip.entries();
@@ -235,23 +261,22 @@ public class Utils {
 				ZipEntry entrada = (ZipEntry)entries.nextElement();
 				arquivo = new File(dir, entrada.getName());
 				
-				// se for diretório inexistente, cria a estrutura e pula 
-				// pra próxima entrada
+				// if nonexistent directory, creates the structure and jump to next entry
 				if (entrada.isDirectory() && !arquivo.exists()) {
 					arquivo.mkdirs();	
 					continue;
 				}
 				
-				// se a estrutura de diretórios não existe, cria
+				// if the directory structure does not exist, creates
 				if (!arquivo.getParentFile().exists()) arquivo.getParentFile().mkdirs();
 				
 				try {
-					// lê o arquivo do zip e grava em disco
+					// reads the zip file and burn to disc
 					is = zip.getInputStream(entrada);
 					os = new FileOutputStream(arquivo);
 					int bytesLidos = 0;
 					
-					if (is == null) throw new ZipException("Erro ao ler a entrada do zip: " + entrada.getName());
+					if (is == null) throw new ZipException("Error reading the zip entry: " + entrada.getName());
 					
 					while ((bytesLidos = is.read(buffer)) > 0) {
 						os.write(buffer, 0, bytesLidos);

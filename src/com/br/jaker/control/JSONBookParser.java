@@ -12,6 +12,10 @@ import android.util.Log;
 import com.br.jaker.exception.BookExpection;
 import com.br.jaker.model.Book;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class JSONBookParser {
 
 	/**

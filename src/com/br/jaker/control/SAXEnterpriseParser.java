@@ -13,6 +13,10 @@ import com.br.jaker.model.Address;
 import com.br.jaker.model.Enterprise;
 import com.br.jaker.model.Manager;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class SAXEnterpriseParser extends DefaultHandler {
 
 	private Enterprise enterprise;

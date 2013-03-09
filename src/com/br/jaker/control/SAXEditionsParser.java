@@ -13,6 +13,10 @@ import android.util.Xml.Encoding;
 import com.br.jaker.exception.EditionException;
 import com.br.jaker.model.Edition;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class SAXEditionsParser extends DefaultHandler {
 
 	private List<Edition> editions;	

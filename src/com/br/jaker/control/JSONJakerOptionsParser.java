@@ -6,6 +6,10 @@ import android.util.Log;
 import com.br.jaker.exception.JakerOptionsException;
 import com.br.jaker.model.JakerOptions;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class JSONJakerOptionsParser {
 
 	/**

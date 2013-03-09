@@ -20,6 +20,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class SplashActivity extends Activity {
 
 	private JakerApp jakerApp;

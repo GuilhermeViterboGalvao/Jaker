@@ -9,6 +9,10 @@ import android.util.Log;
 import com.br.jaker.exception.AuthorsException;
 import com.br.jaker.model.Author;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class JSONAuthorsParse {
 
 	/**

@@ -1,5 +1,9 @@
 package com.br.jaker.util;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class Messages {
 
 	public static final String notConnected = "You don't have any internet connection.";

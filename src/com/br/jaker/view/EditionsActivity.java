@@ -38,6 +38,18 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 //TODO override onRestoreInstanceState and onSaveInstanceState
+//Ler o xml das edições, salvá-lo no celular, caso haja um nova edição baixá - la e depois disso
+//alterar o arquivo no celular, notificado que aquela edição já foi baixada.
+
+//Sempre que o app for ligado, verificar por atualizações, caso o usuário não tiver conexão com a 
+//internet ignorar e seguir como base o xml salvo no celular.
+
+//Caso alguma edição seja perdida ignorar, caso o usuário deseje ver aquela edição notificar a perda e
+//perguntar se ele quer baixa-la novamente.
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class EditionsActivity extends Activity implements OnClickListener {
 
 	private JakerApp jakerApp;

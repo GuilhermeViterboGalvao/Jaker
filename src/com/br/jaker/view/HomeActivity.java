@@ -12,6 +12,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 @SuppressLint("SetJavaScriptEnabled")
 public class HomeActivity extends Activity {
 		
