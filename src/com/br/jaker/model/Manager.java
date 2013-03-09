@@ -1,6 +1,10 @@
 package com.br.jaker.model;
 
-public class Manager {
+import java.io.Serializable;
+
+public class Manager implements Serializable {
+
+	private static final long serialVersionUID = -4497912557645356816L;
 
 	private String name;
 	

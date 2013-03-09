@@ -1,6 +1,10 @@
 package com.br.jaker.model;
 
-public class Edition {
+import java.io.Serializable;
+
+public class Edition implements Serializable{
+
+	private static final long serialVersionUID = -1989510013903377541L;
 
 	private boolean newEdition;
 	

@@ -1,6 +1,10 @@
 package com.br.jaker.model;
 
-public class Author {
+import java.io.Serializable;
+
+public class Author implements Serializable {
+
+	private static final long serialVersionUID = 489278591356255593L;
 
 	private String name;
 	

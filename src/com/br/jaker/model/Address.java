@@ -1,7 +1,11 @@
 package com.br.jaker.model;
 
-public class Address {
-	
+import java.io.Serializable;
+
+public class Address implements Serializable {
+
+	private static final long serialVersionUID = -6870701748391502047L;
+
 	private String country;
 	
 	private String state;

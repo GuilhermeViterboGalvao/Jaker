@@ -1,6 +1,10 @@
 package com.br.jaker.model;
 
-public class JakerOptions {
+import java.io.Serializable;
+
+public class JakerOptions implements Serializable {
+
+	private static final long serialVersionUID = 7057199178382344101L;
 
 	private String background;
 	
