@@ -17,6 +17,8 @@ public class Book implements Serializable {
 	private List<String> contents;
 	
 	private JakerOptions jakerOptions;
+	
+	private Edition edition;
 
 	public String getTitle() {
 		return title;
@@ -56,5 +58,13 @@ public class Book implements Serializable {
 
 	public void setJakerOptions(JakerOptions jakerOptions) {
 		this.jakerOptions = jakerOptions;
+	}
+	
+	public Edition getEdition() {
+		return edition;
+	}
+
+	public void setEdition(Edition edition) {
+		this.edition = edition;
 	}
 }

@@ -116,7 +116,7 @@ public class SplashActivity extends Activity {
 			cancelProgressDialog();
 			if (editions != null) {
 				jakerApp.setEditions(editions);				
-				startActivity(new Intent(SplashActivity.this, EditionsListActivity.class));
+				startActivity(new Intent(SplashActivity.this, EditionsActivity.class));
 			} else {
 				showAlertDialog();
 			}

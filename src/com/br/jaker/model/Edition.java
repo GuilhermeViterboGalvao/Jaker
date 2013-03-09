@@ -17,6 +17,8 @@ public class Edition implements Serializable{
 	private String coverImage;
 	
 	private String downloadUrl;
+	
+	private Book book;
 
 	public boolean isNewEdition() {
 		return newEdition;
@@ -64,5 +66,13 @@ public class Edition implements Serializable{
 
 	public void setDownloadUrl(String downloadUrl) {
 		this.downloadUrl = downloadUrl;
+	}
+	
+	public Book getBook() {
+		return book;
+	}
+
+	public void setBook(Book book) {
+		this.book = book;
 	}
 }

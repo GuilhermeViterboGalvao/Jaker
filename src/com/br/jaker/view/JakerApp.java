@@ -3,7 +3,6 @@ package com.br.jaker.view;
  import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import com.br.jaker.model.Book;
 import com.br.jaker.model.Edition;
 import com.br.jaker.model.Enterprise;
 import android.app.Application;
@@ -41,16 +40,6 @@ public class JakerApp extends Application {
 	
 	public List<Edition> getEditions() {
 		return editions == null ? new ArrayList<Edition>() : editions;
-	}
-	
-	private List<Book> books;
-	
-	public void setBooks(List<Book> books) {
-		this.books = books;
-	}
-	
-	public List<Book> getBooks() {
-		return books == null ? new ArrayList<Book>() : books;
 	}
 	
 	private File rootPath;

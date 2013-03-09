@@ -4,7 +4,6 @@ import java.util.List;
 import com.br.jaker.view.R;
 import com.br.jaker.component.HorizontalListView;
 import com.br.jaker.model.Book;
-import com.br.jaker.model.Edition;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -24,21 +23,21 @@ public class HomeActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);		
-		LinearLayout homeLayout = (LinearLayout)findViewById(R.home.linearLayout);
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.home);		
+		LinearLayout layoutMain = (LinearLayout)findViewById(R.home.layoutMain);
 		
 		width = getWindowManager().getDefaultDisplay().getWidth();
 		height = getWindowManager().getDefaultDisplay().getHeight();
 		
 		jakerApp = (JakerApp)getApplication();
 						
-		Book book = jakerApp.getBooks().get(0);
-		Edition edition = jakerApp.getEditions().get(0);
+		Book book = (Book)getIntent().getExtras().get("book");
 		
 		List<String> contents = book.getContents();
 		
 		HorizontalListView horizontalListView = new HorizontalListView(this, contents.size(), width);
-		homeLayout.addView(horizontalListView);
+		layoutMain.addView(horizontalListView);
 		
 		LinearLayout wrapper = new LinearLayout(this);		
 		wrapper.setLayoutParams(new LayoutParams(width, height));
@@ -49,10 +48,8 @@ public class HomeActivity extends Activity {
 			webView.setWebViewClient(new WebViewClient());
 			webView.getSettings().setJavaScriptEnabled(true);
 			webView.setLayoutParams(new LayoutParams(width, height));
-			webView.loadUrl("file://" + jakerApp.getRootPath() + "/" + edition.getNumber() + "/" + content);
+			webView.loadUrl("file://" + jakerApp.getRootPath() + "/" + book.getEdition().getNumber() + "/" + content);
 			wrapper.addView(webView);
 		}
-		
-		setContentView(homeLayout);
 	}
 }
