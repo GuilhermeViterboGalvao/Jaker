@@ -1,6 +1,5 @@
 package com.br.jaker.view;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -237,7 +236,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		        
 				try {
 					
-		            in = new BufferedInputStream(response.getEntity().getContent());
+		            in  = response.getEntity().getContent();
 		            out = new FileOutputStream(zip);
 		            
 		            while ( ((read = in.read(buffer)) != -1) && !isCancelled() && jakerApp.isConnected()) {

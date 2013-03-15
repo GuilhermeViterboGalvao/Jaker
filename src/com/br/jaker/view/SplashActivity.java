@@ -1,6 +1,5 @@
 package com.br.jaker.view;
  
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
+
+import org.apache.http.client.utils.CloneUtils;
+
 import com.br.jaker.control.SAXEditionsParser;
 import com.br.jaker.control.SAXEnterpriseParser;
 import com.br.jaker.exception.EditionException;
@@ -133,12 +135,12 @@ public class SplashActivity extends Activity {
 	        
 	        if (!isCancelled()) {
 				try {
-					if (jakerApp.isConnected()) {
-						in  = new BufferedInputStream(Utils.doGet(url));
-						out = new FileOutputStream(editionsXML);					
+					if (jakerApp.isConnected()) {						
+						in  = Utils.doGet(url);						
+						out = new FileOutputStream(editionsXML);
+						editions = SAXEditionsParser.parseEdition((InputStream)CloneUtils.clone(in));
 						while ( ((read = in.read(buffer)) != -1) && !isCancelled() ) out.write(buffer, 0, read);
-						jakerApp.setEditionsXML(editionsXML);
-						editions = SAXEditionsParser.parseEdition(in);
+						jakerApp.setEditionsXML(editionsXML);						
 					} else {
 						if (jakerApp.getEditionsXML() != null) editions = SAXEditionsParser.parseEdition(new FileInputStream(jakerApp.getEditionsXML()));
 					}
