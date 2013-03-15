@@ -54,7 +54,7 @@ public class HorizontalListView extends HorizontalScrollView implements OnTouchL
 			case MotionEvent.ACTION_UP:
 				start = true;
 				this.currentScrollX = x;
-				int minFactor = itemWidth / 2;	
+				int minFactor = itemWidth / 10;
 				if ((this.prevScrollX - this.currentScrollX) > minFactor) {
 					if (activeItem < maxItem - 1)activeItem++;
 				} else if ((this.currentScrollX - this.prevScrollX) > minFactor) {

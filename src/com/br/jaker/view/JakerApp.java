@@ -56,16 +56,6 @@ public class JakerApp extends Application {
 		return rootPath;
 	}
 	
-	private File editionsXML;
-	
-	public File getEditionsXML() {
-		return editionsXML;
-	}
-	
-	public void setEditionsXML(File editionsXML) {
-		this.editionsXML = editionsXML;
-	}
-	
 	private ConnectivityManager connectivityManager;
 	
 	@Override

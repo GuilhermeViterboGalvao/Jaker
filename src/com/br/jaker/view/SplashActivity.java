@@ -13,7 +13,6 @@ import com.br.jaker.control.SAXEnterpriseParser;
 import com.br.jaker.exception.EditionException;
 import com.br.jaker.exception.EnterpriseException;
 import com.br.jaker.model.Edition;
-import com.br.jaker.util.Messages;
 import com.br.jaker.util.Utils;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -98,22 +97,17 @@ public class SplashActivity extends Activity {
 		
 		@Override
 		protected void onPreExecute() {
-			if (jakerApp.isConnected()) {
-				progressDialog = new ProgressDialog(SplashActivity.this);
-				progressDialog.setTitle(jakerApp.getAppName());
-				progressDialog.setMessage("Loading Editions...");
-				progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						if (!editionsDownloader.isCancelled()) editionsDownloader.cancel(true);
-					}
-				});   
-				progressDialog.show();
-				errorMessage = "";
-			} else {
-				errorMessage = Messages.notConnected;
-				cancel(true);
-			}			
+			progressDialog = new ProgressDialog(SplashActivity.this);
+			progressDialog.setTitle(jakerApp.getAppName());
+			progressDialog.setMessage("Loading Editions...");
+			progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					if (!editionsDownloader.isCancelled()) editionsDownloader.cancel(true);
+				}
+			});   
+			progressDialog.show();
+			errorMessage = "";
 		}
 		
 		@Override
@@ -135,11 +129,10 @@ public class SplashActivity extends Activity {
 					if (jakerApp.isConnected()) {						
 						in  = Utils.doGet(url);						
 						out = new FileOutputStream(editionsXML);						
-						while ( ((read = in.read(buffer)) != -1) && !isCancelled() ) out.write(buffer, 0, read);
-						jakerApp.setEditionsXML(editionsXML);	
+						while ( ((read = in.read(buffer)) != -1) && !isCancelled() ) out.write(buffer, 0, read);	
 						editions = SAXEditionsParser.parseEdition(new FileInputStream(editionsXML));
 					} else {
-						if (jakerApp.getEditionsXML() != null) editions = SAXEditionsParser.parseEdition(new FileInputStream(jakerApp.getEditionsXML()));
+						if (editionsXML != null && editionsXML.exists()) editions = SAXEditionsParser.parseEdition(new FileInputStream(editionsXML));						
 					}
 				} catch (EditionException e) {					
 					Log.e("JakerApp.AsyncEditionsDownloader.doInBackground", "Problem on \"SAXEditionsParser.parseEdition(doGet(url))\": " + e.getMessage(), e);
