@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
-
-import org.apache.http.client.utils.CloneUtils;
-
 import com.br.jaker.control.SAXEditionsParser;
 import com.br.jaker.control.SAXEnterpriseParser;
 import com.br.jaker.exception.EditionException;
@@ -137,10 +134,10 @@ public class SplashActivity extends Activity {
 				try {
 					if (jakerApp.isConnected()) {						
 						in  = Utils.doGet(url);						
-						out = new FileOutputStream(editionsXML);
-						editions = SAXEditionsParser.parseEdition((InputStream)CloneUtils.clone(in));
+						out = new FileOutputStream(editionsXML);						
 						while ( ((read = in.read(buffer)) != -1) && !isCancelled() ) out.write(buffer, 0, read);
-						jakerApp.setEditionsXML(editionsXML);						
+						jakerApp.setEditionsXML(editionsXML);	
+						editions = SAXEditionsParser.parseEdition(new FileInputStream(editionsXML));
 					} else {
 						if (jakerApp.getEditionsXML() != null) editions = SAXEditionsParser.parseEdition(new FileInputStream(jakerApp.getEditionsXML()));
 					}
@@ -154,8 +151,8 @@ public class SplashActivity extends Activity {
 					Log.e("JakerApp.AsyncEditionsDownloader.doInBackground", "Problem on \"SAXEditionsParser.parseEdition(doGet(url))\": " + e.getMessage(), e);
 					errorMessage = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
 				} finally {
-					if (in  != null) try { in.close();  } catch (Exception e) { }
-					if (out != null) try { out.close(); } catch (Exception e) { }
+					if (in  != null) try { in.close();               } catch (Exception e) { }
+					if (out != null) try { out.flush(); out.close(); } catch (Exception e) { }
 					if (editions == null && errorMessage != null && errorMessage.equals("")) errorMessage = "The " + jakerApp.getAppName() + " can't read editions.xml or download it!";
 				}	
 	        }
