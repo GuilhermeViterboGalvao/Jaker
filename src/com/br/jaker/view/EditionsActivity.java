@@ -58,7 +58,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	private AlertDialog.Builder alertDialog;
 	
-	private List<AsyncBookDownloader> booksDownloader;	
+	private List<AsyncEditionZipDownloader> editionsDownloader;	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		
 		layoutMain = (LinearLayout)findViewById(R.editions.layoutMain);
 				
-		booksDownloader = new ArrayList<AsyncBookDownloader>();
+		editionsDownloader = new ArrayList<AsyncEditionZipDownloader>();
 		
 		jakerApp = (JakerApp)getApplication();
 		
@@ -75,22 +75,21 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			Button btn = new Button(this);			
 			btn.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
 			btn.setOnClickListener(this);
-			if (edition.isNewEdition()) {
+			if (edition.isNewEdition() && !checkIfExists(edition)) {
 				btn.setText(edition.getTitle() + " Nº " + edition.getNumber() + " - New Edition");
 				btn.setTag(edition);
 			} else {
 				btn.setText(edition.getTitle() + " Nº " + edition.getNumber());
 				btn.setTag(null);
 			}
-			layoutMain.addView(btn);
-			checkEditionFolder(edition);
+			layoutMain.addView(btn);			
 		}
 	}
 	
 	@Override
 	public void finish() {
-		if (booksDownloader != null) {
-			for (AsyncBookDownloader bookDownloader : booksDownloader) {
+		if (editionsDownloader != null) {
+			for (AsyncEditionZipDownloader bookDownloader : editionsDownloader) {
 				if (!bookDownloader.isCancelled()) {
 					bookDownloader.cancel(true);
 				}
@@ -108,9 +107,9 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				progressDialog.setTitle(jakerApp.getAppName());
 				progressDialog.setMessage("Downloading edition number " + edition.getNumber() + ".");
 				progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				AsyncBookDownloader bookDownloader = new AsyncBookDownloader(progressDialog, (Button)v, true);
-				bookDownloader.execute(edition);
-				booksDownloader.add(bookDownloader);
+				AsyncEditionZipDownloader editionDownloader = new AsyncEditionZipDownloader(progressDialog, (Button)v, true);
+				editionDownloader.execute(edition);
+				editionsDownloader.add(editionDownloader);
 			} else if (v.getTag() != null && v.getTag() instanceof Book) {
 				Intent intent = new Intent(this, HomeActivity.class);
 				intent.putExtra("book", (Book)v.getTag());
@@ -119,15 +118,17 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		}
 	}
 	
-	private void checkEditionFolder(Edition edition) {
+	private boolean checkIfExists(Edition edition) {
+		boolean exists = false;		
 		File editionPath = new File(jakerApp.getRootPath(), Integer.toString(edition.getNumber()));
 		if (editionPath.exists() && editionPath.isDirectory()) {
 			File bookFile = new File(editionPath, "book.json");
-			if (bookFile.exists() && bookFile.isFile()) {
+			if (bookFile.exists() && bookFile.isFile()) {				
 				try {
 					Book book = JSONBookParser.parseBook(new FileInputStream(bookFile));
 					book.setEdition(edition);
 					edition.setBook(book);
+					exists = true;
 				} catch (FileNotFoundException e) {
 					alertDialog = new AlertDialog.Builder(this);
 					alertDialog.setMessage("The file " + bookFile.getAbsolutePath() + " was not found.");
@@ -146,11 +147,12 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				}
 			}
 		}
+		return exists;
 	}
 	
-	public class AsyncBookDownloader extends AsyncTask<Edition, Integer, Book> {
+	public class AsyncEditionZipDownloader extends AsyncTask<Edition, Integer, Book> {
 
-		public AsyncBookDownloader(ProgressDialog progressDialog, Button target, boolean cancelable) {
+		public AsyncEditionZipDownloader(ProgressDialog progressDialog, Button target, boolean cancelable) {
 			this.progressDialog = progressDialog;
 			this.cancelable = cancelable;
 			this.target = target;
@@ -177,7 +179,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							if (AsyncBookDownloader.this.isCancelled()) AsyncBookDownloader.this.cancel(true);
+							if (AsyncEditionZipDownloader.this.isCancelled()) AsyncEditionZipDownloader.this.cancel(true);
 						}
 					});	
 				} 
@@ -199,15 +201,15 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					response = Utils.getHTTPClient().execute(requestGet);
 				} catch (ClientProtocolException cpe) {
 					message = Messages.problemConnectingToTheServer;
-					Log.i("EditionsActivity.AsyncBookDownloader.doInBackground", "Execution stoped: " + cpe.getMessage());
+					Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Execution stoped: " + cpe.getMessage());
 					return null;
 				} catch (IOException ioe) {
 					message = Messages.problemConnectingToTheServer;
-					Log.i("EditionsActivity.AsyncBookDownloader.doInBackground", "Execution stoped: " + ioe.getMessage());
+					Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Execution stoped: " + ioe.getMessage());
 					return null;
 				} catch (Exception e) {
 					message = Messages.problemConnectingToTheServer;
-					Log.i("EditionsActivity.AsyncBookDownloader.doInBackground", "Execution stoped: " + e.getMessage());
+					Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Execution stoped: " + e.getMessage());
 					return null;
 				}
 				
@@ -217,9 +219,9 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					try {
 						response.getEntity().getContent().close();
 					} catch (IOException ioe) {						
-						Log.i("EditionsActivity.AsyncBookDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + ioe.getMessage());
+						Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + ioe.getMessage());
 					} catch (Exception e) {
-						Log.i("EditionsActivity.AsyncBookDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + e.getMessage());
+						Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + e.getMessage());
 					}
 					message = Messages.serverReturnStats + Integer.toString(statusCode);
 					return null;
@@ -247,15 +249,15 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				} catch (IllegalStateException ise) {
 					if (zip != null && zip.exists())zip.delete();
 					message = Messages.problemToDownloadTheFile;
-					Log.e("EditionsActivity.AsyncBookDownloader.doInBackground", ise.getMessage(), ise);
+					Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", ise.getMessage(), ise);
 				} catch (IOException ioe) {
 					if (zip != null && zip.exists())zip.delete();
 					message = Messages.problemToDownloadTheFile;
-					Log.e("EditionsActivity.AsyncBookDownloader.doInBackground", ioe.getMessage(), ioe);
+					Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", ioe.getMessage(), ioe);
 				} catch (Exception e) {
 					if (zip != null && zip.exists())zip.delete();
 					message = Messages.problemToDownloadTheFile;
-					Log.e("EditionsActivity.AsyncBookDownloader.doInBackground", e.getMessage(), e);					
+					Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);					
 				} finally {
 					if(in  != null) try { in.close();  } catch (Exception e) {}
 					if(out != null) try { out.close(); } catch (Exception e) {}
@@ -266,7 +268,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 						Utils.unzip(zip, jakerApp.getRootPath());						
 					} catch (Exception e) {
 						message = Messages.problemOnUnzipFile;
-						Log.e("EditionsActivity.AsyncBookDownloader.doInBackground", e.getMessage(), e);
+						Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);
 					}
 					
 					zip.delete();
@@ -278,7 +280,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 						edition.setBook(book);
 					} catch (Exception e) {
 						message = Messages.problemOnReadJsonBookFile;
-						Log.e("EditionsActivity.AsyncBookDownloader.doInBackground", e.getMessage(), e);
+						Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);
 					}
 					
 					return book;
@@ -321,5 +323,5 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				alertDialog.show();
 			}
 		}
-	}//AsyncBookDownloader
+	}//AsyncEditionZipDownloader
 }

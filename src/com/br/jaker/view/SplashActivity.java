@@ -1,7 +1,13 @@
 package com.br.jaker.view;
  
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import com.br.jaker.control.SAXEditionsParser;
 import com.br.jaker.control.SAXEnterpriseParser;
@@ -36,16 +42,24 @@ public class SplashActivity extends Activity {
 		setContentView(R.layout.splash);
 		
 		jakerApp = (JakerApp)getApplication();
+		boolean readEnterpriseXML = false;
+		String message = "";
 						
 		try {
 			jakerApp.setEnterprise(SAXEnterpriseParser.parseEnterprise(getAssets().open("Enterprise.xml")));
+			readEnterpriseXML = true;
 		} catch (EnterpriseException e) {
-			// TODO Auto-generated catch block
+			readEnterpriseXML = false;
+			message = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			readEnterpriseXML = false;
+			message = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
+		} catch (Exception e) {
+			readEnterpriseXML = false;
+			message = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
 		}
 		
-		if (jakerApp.getEnterprise() != null) {
+		if (readEnterpriseXML) {
 			jakerApp.setAppName(jakerApp.getEnterprise().getName() != null && !jakerApp.getEnterprise().getName().equals("") ? jakerApp.getEnterprise().getName() : "Jaker");
 			
 			File rootPath = new File(Environment.getExternalStorageDirectory(), jakerApp.getAppName());
@@ -54,7 +68,25 @@ public class SplashActivity extends Activity {
 			
 			editionsDownloader = new AsyncEditionsDownloader();
 			editionsDownloader.execute(jakerApp.getEnterprise().getUrlJsonEdtions());
-		}		
+		} else {
+			AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
+			alertDialog.setTitle(jakerApp.getAppName());
+			alertDialog.setMessage(message);
+			alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					SplashActivity.this.finish();
+				}
+			});
+			alertDialog.create();
+			alertDialog.show();
+		}
+	}
+	
+	@Override
+	public void finish() {
+		if (editionsDownloader != null && !editionsDownloader.isCancelled()) editionsDownloader.cancel(true);
+		super.finish();
 	}
 	
 	public class AsyncEditionsDownloader extends AsyncTask<String, Void, List<Edition>> {
@@ -92,20 +124,40 @@ public class SplashActivity extends Activity {
 			
 			String url = params[0];
 			List<Edition> editions = null;
-			
-			if (!isCancelled()) {
+						
+			int read         = 0;				
+	        InputStream in   = null;
+	        OutputStream out = null;
+	        byte buffer[]    = new byte[1024];
+	        File editionsXML = new File(jakerApp.getRootPath(), "editions.xml");
+	        
+	        if (!isCancelled()) {
 				try {
-					editions = SAXEditionsParser.parseEdition(Utils.doGet(url));
+					if (jakerApp.isConnected()) {
+						in  = new BufferedInputStream(Utils.doGet(url));
+						out = new FileOutputStream(editionsXML);					
+						while ( ((read = in.read(buffer)) != -1) && !isCancelled() ) out.write(buffer, 0, read);
+						jakerApp.setEditionsXML(editionsXML);
+						editions = SAXEditionsParser.parseEdition(in);
+					} else {
+						if (jakerApp.getEditionsXML() != null) editions = SAXEditionsParser.parseEdition(new FileInputStream(jakerApp.getEditionsXML()));
+					}
 				} catch (EditionException e) {					
 					Log.e("JakerApp.AsyncEditionsDownloader.doInBackground", "Problem on \"SAXEditionsParser.parseEdition(doGet(url))\": " + e.getMessage(), e);
 					errorMessage = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
+				} catch (FileNotFoundException e) {
+					Log.e("JakerApp.AsyncEditionsDownloader.doInBackground", "Problem on \"SAXEditionsParser.parseEdition(doGet(url))\": " + e.getMessage(), e);
+					errorMessage = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
+				} catch (Exception e) {
+					Log.e("JakerApp.AsyncEditionsDownloader.doInBackground", "Problem on \"SAXEditionsParser.parseEdition(doGet(url))\": " + e.getMessage(), e);
+					errorMessage = "The " + jakerApp.getAppName() + " app stopped working because: " + e.getMessage();
 				} finally {
-					if (editions == null && errorMessage != null && errorMessage.equals("")) {
-						errorMessage = "The " + jakerApp.getAppName() + " app stopped working!";
-					}
-				}
-			}
-			
+					if (in  != null) try { in.close();  } catch (Exception e) { }
+					if (out != null) try { out.close(); } catch (Exception e) { }
+					if (editions == null && errorMessage != null && errorMessage.equals("")) errorMessage = "The " + jakerApp.getAppName() + " can't read editions.xml or download it!";
+				}	
+	        }
+	        
 			return editions;
 		}
 		
@@ -131,6 +183,12 @@ public class SplashActivity extends Activity {
 			alertDialog = new AlertDialog.Builder(SplashActivity.this);
 			alertDialog.setTitle(jakerApp.getAppName());
 			alertDialog.setMessage(errorMessage);
+			alertDialog.setNegativeButton("OK", new DialogInterface.OnClickListener() {				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					SplashActivity.this.finish();
+				}
+			});			
 			alertDialog.create();
 			alertDialog.show();
 		}
@@ -138,5 +196,5 @@ public class SplashActivity extends Activity {
 		private void cancelProgressDialog() {
 			if (progressDialog != null && progressDialog.isShowing()) progressDialog.dismiss();
 		}
-	}
-}
+	}//AsyncEditionsDownloader
+}//SplashActivity
