@@ -104,7 +104,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				editionDownloader.execute(edition);
 				editionsDownloader.add(editionDownloader);
 			} else if (edition != null && !edition.isNewEdition()) {
-				Intent intent = new Intent(this, HomeActivity.class);
+				Intent intent = new Intent(this, JakerSliderPaginatorActivity.class);
 				intent.putExtra("book", edition.getBook());
 				startActivity(intent);				
 			}
