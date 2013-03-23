@@ -6,6 +6,10 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class JakerSliderPaginatorActivity extends FragmentActivity {
 
 	private ViewPager viewPager;
@@ -17,10 +21,10 @@ public class JakerSliderPaginatorActivity extends FragmentActivity {
 		
 		JakerApp jakerApp = (JakerApp)getApplication();
 		
-		Book book = (Book)getIntent().getExtras().get("book");
+		Book book = (Book)getIntent().getExtras().get("book");	
 		
-		viewPager = (ViewPager)findViewById(R.sliderPaginator.pager);
-		viewPager.setAdapter(new SlidePageAdapter(getSupportFragmentManager(), book, jakerApp));
+		viewPager = (ViewPager)findViewById(R.sliderPaginator.pager);		
+		viewPager.setAdapter(new SlidePageAdapter(this, getSupportFragmentManager(), book, jakerApp));
 	}
 	
 	@Override
