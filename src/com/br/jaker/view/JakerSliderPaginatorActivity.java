@@ -1,7 +1,8 @@
 package com.br.jaker.view;
 
+import br.com.jaker.custom.component.SlidePageAdapter;
+
 import com.br.jaker.model.Book;
-import com.br.jaker.util.SlidePageAdapter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -23,7 +24,8 @@ public class JakerSliderPaginatorActivity extends FragmentActivity {
 		
 		Book book = (Book)getIntent().getExtras().get("book");	
 		
-		viewPager = (ViewPager)findViewById(R.sliderPaginator.pager);		
+		viewPager = (ViewPager)findViewById(R.sliderPaginator.pager);
+		viewPager.setOffscreenPageLimit(3);		
 		viewPager.setAdapter(new SlidePageAdapter(this, getSupportFragmentManager(), book, jakerApp));
 	}
 	

@@ -1,4 +1,4 @@
-package com.br.jaker.view;
+package br.com.jaker.custom.component;
 
 import android.webkit.WebView;
 import android.webkit.WebViewClient;

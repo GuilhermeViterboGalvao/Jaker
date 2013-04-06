@@ -20,7 +20,6 @@
         android:theme="@style/AppTheme" >
 
         <activity android:name="com.br.jaker.view.JakerSliderPaginatorActivity"
-                  android:screenOrientation="portrait"
             	  android:theme="@android:style/Theme.NoTitleBar"/>
         
         <activity android:name="com.br.jaker.view.EditionsActivity"

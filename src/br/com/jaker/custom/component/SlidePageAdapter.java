@@ -1,7 +1,9 @@
-package com.br.jaker.util;
+package br.com.jaker.custom.component;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 
 import com.br.jaker.model.Book;
 import com.br.jaker.view.JakerApp;
@@ -15,7 +17,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
  * @author guilherme
  * @email catanduva.gvg@gmail.com
  * */
-public class SlidePageAdapter extends FragmentStatePagerAdapter {
+public class SlidePageAdapter extends FragmentStatePagerAdapter implements Serializable {
+
+	private static final long serialVersionUID = -4953818757800767840L;
 
 	public SlidePageAdapter(Context context, FragmentManager fm, Book book, JakerApp jakerApp) {
 		super(fm);		

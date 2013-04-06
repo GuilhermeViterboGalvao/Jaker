@@ -1,9 +1,7 @@
-package com.br.jaker.util;
+package br.com.jaker.custom.component;
 
-import com.br.jaker.view.JakerBrowser;
+
 import com.br.jaker.view.R;
-import com.br.jaker.view.R.fragmentWebView;
-import com.br.jaker.view.R.layout;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -11,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 
@@ -40,13 +39,29 @@ public class JakerFragment extends Fragment {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setBuiltInZoomControls(false);
-        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);	
+        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        if (savedInstanceState != null) {
+        	url = savedInstanceState.getString("url");
+        }
 		return fragmentWebView;
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putString("url", url);
+		super.onSaveInstanceState(outState);		
 	}
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
+		if (webView != null) webView.loadUrl(url);
+	}
+	
+	@Override
+	public void onViewStateRestored(Bundle savedInstanceState) {
+		super.onViewStateRestored(savedInstanceState);
 		if (webView != null) webView.loadUrl(url);
 	}
 }
