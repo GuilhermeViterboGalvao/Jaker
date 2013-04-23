@@ -33,14 +33,16 @@ public class JakerFragment extends Fragment {
 		LinearLayout fragmentWebView = (LinearLayout)inflater.inflate(R.layout.fragment_webview, container, false);
 		webView = (WebView)fragmentWebView.findViewById(R.fragmentWebView.webView);
 		webView.setWebViewClient(new JakerBrowser());
-        webView.getSettings().setSupportZoom(false);
+        webView.getSettings().setSupportZoom(true);
         webView.getSettings().setPluginsEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
-        webView.getSettings().setBuiltInZoomControls(false);
-        webView.getSettings().setCacheMode(WebSettings.LOAD_CACHE_ONLY);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_NORMAL);
+        webView.getSettings().setGeolocationEnabled(true);
         webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        webView.getSettings().setPluginsEnabled(true);
         if (savedInstanceState != null) {
         	url = savedInstanceState.getString("url");
         }

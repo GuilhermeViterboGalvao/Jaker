@@ -4,11 +4,14 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"    
     android:orientation="vertical"
-    android:background="#ffffff" >
+    android:background="#ffffff" >    
+    
+    <include layout="@layout/item_menu_top"/>
     
 	<android.support.v4.view.ViewPager
 	    android:id="@+sliderPaginator/pager"
 	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"/>
+	    android:layout_height="fill_parent"
+	/>
 
 </LinearLayout>

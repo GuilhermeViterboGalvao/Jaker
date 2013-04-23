@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+	android:layout_height="42dp"
+    android:background="#ffffff" >
+    
+	<Button
+    	android:id="@+itemMenuTop/btnMenu"
+      	android:layout_width="42dp"
+		android:layout_height="42dp"
+		android:layout_alignParentLeft="true" 
+		android:background="@drawable/menu"            
+    />
+      
+    <Button
+    	android:id="@+itemMenuTop/btnSlide" 
+      	android:layout_width="fill_parent"
+		android:layout_height="42dp"			
+		android:layout_toRightOf="@+slidePaginator/btnMenu"
+		android:text="@string/item_menu_top_slide"
+		android:background="#ffffff"   
+    />
+    
+</RelativeLayout>
