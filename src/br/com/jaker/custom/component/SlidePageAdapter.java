@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-import com.br.jaker.model.Book;
-import com.br.jaker.view.JakerApp;
+import br.com.jaker.model.Book;
+import br.com.jaker.view.JakerApp;
+
 
 import android.content.Context;
 import android.support.v4.app.Fragment;

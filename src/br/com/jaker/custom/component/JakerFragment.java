@@ -1,8 +1,7 @@
 package br.com.jaker.custom.component;
 
 
-import com.br.jaker.view.R;
-
+import br.com.jaker.view.R;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
