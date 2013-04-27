@@ -8,15 +8,16 @@
     
     <br.com.jaker.component.MenuTop        
     	android:layout_width="fill_parent"
-		android:layout_height="42dp"		
-    	android:background="#ffffff"
-    	viewPagerId="@+sliderPaginator/pager"
-    />
-    
-	<android.support.v4.view.ViewPager
-	    android:id="@+sliderPaginator/pager"
-	    android:layout_width="fill_parent"
-	    android:layout_height="fill_parent"
-	/>
+		android:layout_height="fill_parent"		
+    	android:background="#ffffff">
+    	
+    	<android.support.v4.view.ViewPager
+	    	android:id="@+sliderPaginator/pager"
+	    	android:layout_width="fill_parent"
+	    	android:layout_height="fill_parent"
+	    	android:layout_marginTop="42dp"
+		/>
+    	
+    </br.com.jaker.component.MenuTop>
 
 </LinearLayout>

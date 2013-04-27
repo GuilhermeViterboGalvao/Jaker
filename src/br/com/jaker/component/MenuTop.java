@@ -5,7 +5,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -26,32 +25,26 @@ public class MenuTop extends RelativeLayout implements OnClickListener, OnTouchL
 	
 	private ViewPager viewPager;
 	
-	private Context context;
-	
 	private int currentX = 0;
 	
 	private boolean isSmoothingScrool = false;
 	
 	public MenuTop(Context context) {
 		super(context);
-		this.context = context;
-		init(0);
 	}
 	
 	public MenuTop(Context context, AttributeSet attributs){
 		super(context, attributs);
-		this.context = context;
-		init(attributs.getAttributeIntValue("viewPagerId", "viewPagerId", 0));
 	}
 	
 	public MenuTop(Context context, AttributeSet attributs, int defStyle){
 		super(context, attributs, defStyle);
-		this.context = context;
-		init(attributs.getAttributeIntValue("viewPagerId", "viewPagerId", 0));
 	}
 	
-	private void init(int idViewPager) {
-		btnMenu = new Button(context);
+	@Override
+	protected void onFinishInflate() {
+		super.onFinishInflate();
+		btnMenu = new Button(getContext());
 		btnMenu.setOnClickListener(this);
 		btnMenu.setWidth(42);
 		btnMenu.setHeight(42);
@@ -61,23 +54,22 @@ public class MenuTop extends RelativeLayout implements OnClickListener, OnTouchL
 		params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);		
 		addView(btnMenu, params);
 		
-		btnSlider = new Button(context);
+		btnSlider = new Button(getContext());
 		btnSlider.setOnClickListener(this);
 		btnSlider.setHeight(42);
 		btnSlider.setText("Deslise seu dedo aqui");
 		btnSlider.setBackgroundColor(0xffffff);
 		btnSlider.setOnTouchListener(this);
-		
-		
-				
+						
 		params = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT, 42);
 		params.addRule(RelativeLayout.RIGHT_OF, btnMenu.getId());
 		addView(btnSlider, params);
 		
-		//Log.i("ID", "" + getRootView().getResources().getIdentifier("pager", "sliderPaginator", null));
-		
 		viewPager = (ViewPager)findViewById(R.sliderPaginator.pager);
-		
+		params = (LayoutParams)viewPager.getLayoutParams();
+		params.width = RelativeLayout.LayoutParams.FILL_PARENT;
+		params.height = RelativeLayout.LayoutParams.FILL_PARENT;
+		params.addRule(RelativeLayout.ALIGN_BOTTOM, btnMenu.getId());		
 	}
 	
 	@Override
@@ -119,7 +111,7 @@ public class MenuTop extends RelativeLayout implements OnClickListener, OnTouchL
 					viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
 					isSmoothingScrool = true;
 					onSlide.slide(v);
-				}				
+				}		
 				break;
 				
 			case MotionEvent.ACTION_UP:
