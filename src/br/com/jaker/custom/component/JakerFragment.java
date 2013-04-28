@@ -21,6 +21,10 @@ public class JakerFragment extends Fragment {
 	
 	private WebView webView;
 	
+	public WebView getWebView() {
+		return webView;
+	}
+	
 	private String url;
 	
 	public void setUrl(String url) {

@@ -11,7 +11,7 @@
 		android:layout_height="fill_parent"		
     	android:background="#ffffff">
     	
-    	<android.support.v4.view.ViewPager
+    	<br.com.jaker.custom.component.JakerViewPager   
 	    	android:id="@+sliderPaginator/pager"
 	    	android:layout_width="fill_parent"
 	    	android:layout_height="fill_parent"

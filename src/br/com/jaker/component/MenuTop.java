@@ -1,5 +1,7 @@
 package br.com.jaker.component;
 
+import br.com.jaker.custom.component.JakerFragment;
+import br.com.jaker.custom.component.SlidePageAdapter;
 import br.com.jaker.view.R;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
@@ -66,9 +69,12 @@ public class MenuTop extends RelativeLayout implements OnClickListener, OnTouchL
 		addView(btnSlider, params);
 		
 		viewPager = (ViewPager)findViewById(R.sliderPaginator.pager);
+		viewPager.setOnTouchListener(this);
+		viewPager.setClickable(false);
 		params = (LayoutParams)viewPager.getLayoutParams();
 		params.width = RelativeLayout.LayoutParams.FILL_PARENT;
 		params.height = RelativeLayout.LayoutParams.FILL_PARENT;
+		params.topMargin = 42;
 		params.addRule(RelativeLayout.ALIGN_BOTTOM, btnMenu.getId());		
 	}
 	
@@ -78,46 +84,62 @@ public class MenuTop extends RelativeLayout implements OnClickListener, OnTouchL
 			onMenuButtonClick.click(btnMenu);
 		}
 	}	
-		
-	public void setOnMenuButtonClick(OnMenuButtonClick onMenuButtonClick) {
-		this.onMenuButtonClick = onMenuButtonClick;
-	}
-
-	public void setOnSlide(OnSlide onSlide) {
-		this.onSlide = onSlide;
-	}
 
 	public interface OnMenuButtonClick {
 		void click(View view);
 	}
 	
+	public void setOnMenuButtonClick(OnMenuButtonClick onMenuButtonClick) {
+		this.onMenuButtonClick = onMenuButtonClick;
+	}
+
 	public interface OnSlide {
 		void slide(View view);
+	}
+	
+	public void setOnSlide(OnSlide onSlide) {
+		this.onSlide = onSlide;
 	}
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		switch (event.getAction()) {
-			case MotionEvent.ACTION_MOVE:
-				if (currentX == 0) {
-					currentX = (int)event.getRawX();
-				} else if (currentX < (int)event.getRawX() && !isSmoothingScrool) {
-					//Moving to right
-					viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
-					isSmoothingScrool = true;
-					onSlide.slide(v);
-				} else if (currentX > (int)event.getRawX() && !isSmoothingScrool) {
-					//Moving to left
-					viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
-					isSmoothingScrool = true;
-					onSlide.slide(v);
-				}		
-				break;
-				
-			case MotionEvent.ACTION_UP:
-				currentX = 0;
-				isSmoothingScrool = false;
-				break;
+		
+		if (v.equals(btnSlider)) {
+			switch (event.getAction()) {
+				case MotionEvent.ACTION_MOVE:				
+					if (currentX == 0) {
+						currentX = (int)event.getRawX();
+					} else if (currentX > (int)event.getRawX() 
+								&& !isSmoothingScrool 
+									&& viewPager.getCurrentItem() < viewPager.getAdapter().getCount()) {
+						//Moving to left
+						viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
+						isSmoothingScrool = true;
+						if (onSlide != null) {
+							onSlide.slide(v);
+						}
+					} else if (currentX < (int)event.getRawX() 
+								&& !isSmoothingScrool 
+									&& viewPager.getCurrentItem() != 0) {
+						//Moving to right
+						viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
+						isSmoothingScrool = true;
+						if (onSlide != null) {
+							onSlide.slide(v);
+						}
+					}		
+					break;
+					
+				case MotionEvent.ACTION_UP:
+					currentX = 0;
+					isSmoothingScrool = false;
+					break;
+			}	
+		} else if (v.equals(viewPager)) {
+			SlidePageAdapter adapter = (SlidePageAdapter)viewPager.getAdapter();
+			JakerFragment fragment = (JakerFragment)adapter.getItem(viewPager.getCurrentItem());
+			WebView webView = fragment.getWebView();
+			webView.onTouchEvent(event);
 		}
 
 		return true;
