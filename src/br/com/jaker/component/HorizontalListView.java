@@ -20,6 +20,7 @@ public class HorizontalListView extends HorizontalScrollView implements OnTouchL
 		this.itemWidth = itemWidth;
 		this.gestureDetector = new GestureDetector(this);
 		this.setOnTouchListener(this);
+		//Teste
 	}
 
 	private HorizontalListView(Context context) {
