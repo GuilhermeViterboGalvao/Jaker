@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -39,6 +38,8 @@ public class Menu extends RelativeLayout implements OnTouchListener {
 	private Slider slider;
 	
 	private int firstX = 0;
+	
+	private int currentX = 0;
 	
 	@Override
 	protected void onFinishInflate() {
@@ -72,31 +73,36 @@ public class Menu extends RelativeLayout implements OnTouchListener {
 		params.topMargin = 42;
 		params.addRule(RelativeLayout.ALIGN_BOTTOM, btnMenu.getId());
 		
+		
+		
 		super.onFinishInflate();
 	}
 
 	@Override
-	public boolean onTouch(View view, MotionEvent event) {
-		Log.i("", "firstX: " + firstX);
-		Log.i("", "currentX: " + resize((int)event.getRawX()));
-		
+	public boolean onTouch(View view, MotionEvent event) {		
 		if (view instanceof Slider || view instanceof FrameLayout) {
 			switch (event.getAction()) {
 			
 				case MotionEvent.ACTION_MOVE:
-					viewPager.scrollTo(firstX + resize((int)event.getRawX()), 0);
+					slider.setVisibility(VISIBLE);
+					currentX = resize((int)event.getRawX());
 					if (firstX == 0) {
-						slider.setVisibility(VISIBLE);
-						firstX = resize((int)event.getRawX());
-					}					
+						firstX = currentX;
+					}
 					break;
 					
 				case MotionEvent.ACTION_UP:
-					Log.i("", "currentItem: " + getCurrentPosition(resize((int)event.getRawX())));
-					viewPager.setCurrentItem(getCurrentPosition(resize((int)event.getRawX())), true);
+					if (firstX < currentX && viewPager.getCurrentItem() > 0) {
+						// <------						
+						viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+					} else if (firstX > currentX && (viewPager.getCurrentItem() + 1) < viewPager.getAdapter().getCount()) {
+						// ------>						
+						viewPager.setCurrentItem(viewPager.getCurrentItem() + 1);
+					}
 					slider.setVisibility(GONE);
 					firstX = 0;
 					break;
+					
 			}
 			slider.onTouchEvent(event);
 		} else if (view instanceof ViewPager) {
@@ -110,10 +116,6 @@ public class Menu extends RelativeLayout implements OnTouchListener {
 	}
 	
 	public int resize(int x) {
-		return (x * (viewPager.getWidth() * (viewPager.getCurrentItem() + 1))) / frameLayout.getWidth();
-	}
-	
-	public int getCurrentPosition(int x) {
-		return  (int)Math.floor((x * viewPager.getAdapter().getCount()) / (viewPager.getWidth() * viewPager.getAdapter().getCount()));
+		return (x * viewPager.getWidth() * (viewPager.getCurrentItem() + 1)) / frameLayout.getWidth();
 	}
 }
