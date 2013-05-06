@@ -5,6 +5,10 @@ import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class JakerViewPager extends ViewPager {
 
 	public JakerViewPager(Context context) {

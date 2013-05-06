@@ -15,6 +15,10 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 @SuppressLint("NewApi")
 public class MenuTop extends RelativeLayout implements OnClickListener, OnTouchListener {
 	

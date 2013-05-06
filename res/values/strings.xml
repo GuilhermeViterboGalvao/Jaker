@@ -4,6 +4,10 @@
     <string name="app_name">Jaker</string>
     <string name="action_settings">Settings</string>
     
+    <string name="splash_txt">Jaker</string>
+    
     <string name="item_menu_top_slide">Passe o dedo aqui</string>
+    
+    
 
 </resources>

@@ -19,11 +19,11 @@
 		"indexHeight": 200,
 		"backgroundImagePortrait": "images/background-portrait.png",
 		"backgroundImageLandscape": "images/background-landscape.png",
-		"pageNumbersColor": "#333",
+		"pageNumbersColor": "#333"
 		"menu": {
 			"position": "top", //bottom
 			"height": 60, //max is 100
-			"indexButton": [
+			"buttonsImages": [
 				"pages/1.jpg",
 				"pages/2.jpg",
 				"pages/3.jpg",

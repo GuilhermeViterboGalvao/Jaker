@@ -3,9 +3,9 @@
 	<edition>
 		<new>true</new>
 		<number>1</number>
-		<title>Fluir - 1</title>
-		<description>Fluir - 1</description>
-		<coverImage></coverImage>
+		<title>Jaker</title>
+		<description>Jaker first edition</description>
+		<coverImage>http://waves.terra.com.br/fluir/editions/1.jpg</coverImage>
 		<downloadUrl>http://waves.terra.com.br/fluir/editions/1.zip</downloadUrl>
 	</edition>
 </editions>

@@ -21,7 +21,9 @@ public class JakerOptions implements Serializable {
 	private String backgroundImageLandscape;
 	
 	private String pageNumbersColor;
-
+	
+	private Menu menu;
+	
 	public String getBackground() {
 		return background;
 	}
@@ -68,5 +70,13 @@ public class JakerOptions implements Serializable {
 
 	public void setPageNumbersColor(String pageNumbersColor) {
 		this.pageNumbersColor = pageNumbersColor;
+	}
+
+	public Menu getMenu() {
+		return menu;
+	}
+
+	public void setMenu(Menu menu) {
+		this.menu = menu;
 	}
 }

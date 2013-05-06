@@ -220,9 +220,9 @@ public final class Utils {
 			byte[] bytes = new byte[1024];		 
 			while ((read = zip.read(bytes)) != -1) out.write(bytes, 0, read);		
 		} catch (IOException ioe) {
-			Log.e("Utils.writeZipInputStream", "Problem o write zip file: " + ioe.getMessage(), ioe);
+			Log.e("Utils.writeZip", "Problem o write zip file: " + ioe.getMessage(), ioe);
 		} catch (Exception e) {
-			Log.e("Utils.writeZipInputStream", "Problem o write zip file: " + e.getMessage(), e);
+			Log.e("Utils.writeZip", "Problem o write zip file: " + e.getMessage(), e);
 		} finally {
 			if (out != null) {
 				try {
@@ -233,6 +233,33 @@ public final class Utils {
 		}
 		return dir;
 	}
+	
+	/**
+	 * This method creates a file in the directory reported by the "dir" parameter.
+	 * @param file - The InputStream of file.
+	 * @param dir - The directory where the file will be created.
+	 * */
+	public static File write(InputStream in, File dir) {
+		OutputStream out = null;
+		try {
+			out = new FileOutputStream(dir);
+			int read = 0;
+			byte[] bytes = new byte[1024];		 
+			while ((read = in.read(bytes)) != -1) out.write(bytes, 0, read);		
+		} catch (IOException ioe) {
+			Log.e("Utils.write", "Problem o write file: " + ioe.getMessage(), ioe);
+		} catch (Exception e) {
+			Log.e("Utils.write", "Problem o write file: " + e.getMessage(), e);
+		} finally {
+			if (out != null) {
+				try {
+					out.flush();
+					out.close();	
+				} catch (Exception e) {	}
+			}
+		}
+		return dir;
+	}	
 	
 	/**
 	 * This method extracts the zip file in the directory informed by parameter "dir".

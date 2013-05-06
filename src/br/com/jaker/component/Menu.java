@@ -15,6 +15,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class Menu extends RelativeLayout implements OnTouchListener {
 
 	public Menu(Context context) {

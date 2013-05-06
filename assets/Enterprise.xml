@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <enterprise>
-	<name>Fluir</name>
+	<name>Jaker</name>
 	<site>http://fluir.terra.com.br/</site>
 	<urlJsonEdtions>http://waves.terra.com.br/fluir/editions.xml</urlJsonEdtions>
 	<address country="" state="" city="" neighborhood="" street="" code="" others=""/>

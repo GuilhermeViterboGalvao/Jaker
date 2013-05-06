@@ -3,7 +3,6 @@ package br.com.jaker.view;
  import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import br.com.jaker.model.Edition;
 import br.com.jaker.model.Enterprise;
 import android.app.Application;
@@ -55,6 +54,18 @@ public class JakerApp extends Application {
 	
 	public File getRootPath() {
 		return rootPath;
+	}
+	
+	private File cachePath;
+	
+	public File getCachePath() {
+		if (rootPath != null && cachePath == null) {
+			cachePath = new File(rootPath, "cache");
+			if (!cachePath.exists()) {
+				cachePath.mkdirs();
+			}
+		}	
+		return cachePath;
 	}
 	
 	private ConnectivityManager connectivityManager;

@@ -28,16 +28,22 @@ import br.com.jaker.util.Utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * @author guilherme
@@ -51,33 +57,53 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	private AlertDialog.Builder alertDialog;
 	
-	private List<AsyncEditionZipDownloader> editionsDownloader;	
+	private List<AsyncEditionZipDownloader> editionsDownloader;
+	
+	private List<DownloadCoverImage> downloadsCoversImages;
+	
+	private LayoutInflater inflater;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.editions);
 		
+		inflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
 		layoutMain = (LinearLayout)findViewById(R.editions.layoutMain);
 				
 		editionsDownloader = new ArrayList<AsyncEditionZipDownloader>();
 		
+		downloadsCoversImages = new ArrayList<DownloadCoverImage>();
+		
 		jakerApp = (JakerApp)getApplication();
 		
-		boolean exists = false;
-		
 		for (Edition edition : jakerApp.getEditions()) {
-			exists = checkIfExists(edition);
-			Button btn = new Button(this);			
-			btn.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
-			btn.setOnClickListener(this);
-			btn.setTag(edition);			
-			btn.setText(edition.isNewEdition() && !exists ? 
-							edition.getTitle() + " Nº " + edition.getNumber() + " - New Edition" 
-						: 
-							edition.getTitle() + " Nº " + edition.getNumber()
-			);				
-			layoutMain.addView(btn);			
+			LinearLayout layoutCover = (LinearLayout)inflater.inflate(R.layout.cover, null, false);
+			ImageView img = (ImageView)layoutCover.findViewById(R.cover.img);
+			img.setLayoutParams(new LayoutParams(25, 50));
+			img.setOnClickListener(this);
+			img.setTag(edition);
+			String coverImage = edition.getCoverImage();
+			if (coverImage != null && !coverImage.equals("")) {
+				String fileName = coverImage.substring(coverImage.lastIndexOf('/'), coverImage.length());
+				File image = new File(jakerApp.getCacheDir(), fileName);
+				if (image.exists() && image.isFile()) {
+					img.setImageBitmap(BitmapFactory.decodeFile(image.getAbsolutePath()));
+				} else {
+					img.setImageResource(R.drawable.loading);
+					DownloadCoverImage downloadCoverImage = new DownloadCoverImage();
+					downloadCoverImage.execute(new Object[]{img, coverImage});
+					downloadsCoversImages.add(downloadCoverImage);
+				}
+			}
+			TextView txt = (TextView)layoutCover.findViewById(R.cover.img);
+			txt.setText(edition.isNewEdition() && !checkIfExists(edition) ? 
+						edition.getTitle() + " Nº " + edition.getNumber() + " - New Edition" 
+					: 
+						edition.getTitle() + " Nº " + edition.getNumber()
+			);
+			layoutMain.addView(layoutCover);			
 		}
 	}
 	
@@ -90,14 +116,23 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				}
 			}
 		}
+		if (downloadsCoversImages != null) {
+			for (DownloadCoverImage downloadCoverImage : downloadsCoversImages) {
+				if (!downloadCoverImage.isCancelled()) {
+					downloadCoverImage.cancel(true);
+				}
+			}
+		}
 		super.finish();
 	}
 	
 	@Override
 	public void onClick(View v) {
-		if (v instanceof Button) {
+		if (v instanceof ImageView) {
 			Edition edition = null;
-			if (v.getTag() != null && v.getTag() instanceof Edition) edition = (Edition)v.getTag();			
+			if (v.getTag() != null && v.getTag() instanceof Edition) {
+				edition = (Edition)v.getTag();			
+			}
 			if (edition != null && edition.isNewEdition()) {
 				ProgressDialog progressDialog = new ProgressDialog(this);
 				progressDialog.setTitle(jakerApp.getAppName());
@@ -106,10 +141,8 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				AsyncEditionZipDownloader editionDownloader = new AsyncEditionZipDownloader(progressDialog, (Button)v, true);
 				editionDownloader.execute(edition);
 				editionsDownloader.add(editionDownloader);
-			} else if (edition != null && !edition.isNewEdition()) {
-				Intent intent = new Intent(this, JakerSliderPaginatorActivity.class);
-				intent.putExtra("book", edition.getBook());
-				startActivity(intent);				
+			} else {
+				startActivity(new Intent(this, JakerSliderPaginatorActivity.class).putExtra("book", edition.getBook()));				
 			}
 		}
 	}
@@ -146,6 +179,44 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		}
 		return exists;
 	}
+	
+	public class DownloadCoverImage extends AsyncTask<Object, Void, Bitmap> {
+
+		private ImageView img;
+		
+		@Override
+		protected Bitmap doInBackground(Object... params) {
+			if (params.length >= 2) {
+				Object img = params[0];
+				Object coverImage = params[1];
+				if (img instanceof ImageView) {
+					this.img = (ImageView)img;
+				} else {
+					return null;
+				}				
+				if (coverImage instanceof String) {
+					String url = (String)coverImage;
+					if (jakerApp.isConnected()) {
+						InputStream in = Utils.doGet(url);
+						String fileName = url.substring(url.lastIndexOf('/'), url.length());
+						Utils.write(in, new File(jakerApp.getCacheDir(), fileName));
+						return BitmapFactory.decodeStream(in);
+					}
+				}
+			}
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Bitmap bitmap) {
+			if (img != null && bitmap != null) {
+				img.setImageBitmap(bitmap);
+			} else {
+				img.setImageResource(R.drawable.warning);
+			}
+		}
+		
+	}//DownloadCoverImage
 	
 	public class AsyncEditionZipDownloader extends AsyncTask<Edition, Integer, Book> {
 
@@ -321,4 +392,4 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			}
 		}
 	}//AsyncEditionZipDownloader
-}
+}//EditionsActivity

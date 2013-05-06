@@ -8,6 +8,10 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+/**
+ * @author guilherme
+ * @email catanduva.gvg@gmail.com
+ * */
 public class Slider extends View {
 
 	public Slider(Context context) {
