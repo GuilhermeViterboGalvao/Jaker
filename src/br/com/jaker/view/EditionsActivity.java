@@ -31,6 +31,7 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -73,12 +74,13 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		
 		for (Edition edition : jakerApp.getEditions()) {
 			LinearLayout layoutCover = new LinearLayout(this);
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, LayoutParams.WRAP_CONTENT);
+			layoutCover.setOrientation(LinearLayout.VERTICAL);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(100, LayoutParams.WRAP_CONTENT);
 			params.rightMargin = 20;
 			layoutCover.setLayoutParams(new LinearLayout.LayoutParams(80, LayoutParams.WRAP_CONTENT));
 			ImageView img = new ImageView(this);
 			img.setId(img_id);
-			img.setLayoutParams(new LayoutParams(80, 160));			
+			img.setLayoutParams(new LayoutParams(100, 160));			
 			img.setOnClickListener(this);
 			img.setTag(layoutCover);
 			String coverImage = edition.getCoverImage();
@@ -96,10 +98,10 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			}
 			layoutCover.addView(img);
 			TextView txt = new TextView(this);
-			txt.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, 20));
 			txt.setId(txt_id);
-			txt.setTextSize(20);
-			txt.setTextColor(Color.RED);
+			txt.setTextSize(10);
+			txt.setTextColor(Color.WHITE);
+			txt.setGravity(Gravity.CENTER);
 			txt.setText(edition.isNewEdition() && !checkIfExists(edition) ? 
 						edition.getTitle() + " Nº " + edition.getNumber() + " - New Edition" 
 					: 
