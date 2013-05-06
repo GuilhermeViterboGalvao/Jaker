@@ -23,15 +23,14 @@ import br.com.jaker.util.Utils;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -45,6 +44,10 @@ import android.widget.TextView;
  * */
 public class EditionsActivity extends Activity implements OnClickListener {
 
+	private static final int txt_id = 100;
+	
+	private static final int img_id = 200;
+	
 	private JakerApp jakerApp;
 	
 	private LinearLayout layoutMain;
@@ -55,14 +58,10 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	private List<DownloadCoverImage> downloadsCoversImages;
 	
-	private LayoutInflater inflater;
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.editions);
-		
-		inflater = (LayoutInflater)getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
 		layoutMain = (LinearLayout)findViewById(R.editions.layoutMain);
 				
@@ -73,15 +72,19 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		jakerApp = (JakerApp)getApplication();
 		
 		for (Edition edition : jakerApp.getEditions()) {
-			LinearLayout layoutCover = (LinearLayout)inflater.inflate(R.layout.cover, null, false);
-			ImageView img = (ImageView)layoutCover.findViewById(R.cover.img);
-			img.setLayoutParams(new LayoutParams(25, 50));
+			LinearLayout layoutCover = new LinearLayout(this);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(80, LayoutParams.WRAP_CONTENT);
+			params.rightMargin = 20;
+			layoutCover.setLayoutParams(new LinearLayout.LayoutParams(80, LayoutParams.WRAP_CONTENT));
+			ImageView img = new ImageView(this);
+			img.setId(img_id);
+			img.setLayoutParams(new LayoutParams(80, 160));			
 			img.setOnClickListener(this);
 			img.setTag(layoutCover);
 			String coverImage = edition.getCoverImage();
 			if (coverImage != null && !coverImage.equals("")) {
-				String fileName = coverImage.substring(coverImage.lastIndexOf('/'), coverImage.length());
-				File image = new File(jakerApp.getCacheDir(), fileName);
+				String fileName = coverImage.substring(coverImage.lastIndexOf('/') + 1, coverImage.length());
+				File image = new File(jakerApp.getCachePath(), fileName);
 				if (image.exists() && image.isFile()) {
 					img.setImageBitmap(BitmapFactory.decodeFile(image.getAbsolutePath()));
 				} else {
@@ -91,13 +94,19 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					downloadsCoversImages.add(downloadCoverImage);
 				}
 			}
-			TextView txt = (TextView)layoutCover.findViewById(R.cover.txt);
+			layoutCover.addView(img);
+			TextView txt = new TextView(this);
+			txt.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, 20));
+			txt.setId(txt_id);
+			txt.setTextSize(20);
+			txt.setTextColor(Color.RED);
 			txt.setText(edition.isNewEdition() && !checkIfExists(edition) ? 
 						edition.getTitle() + " Nº " + edition.getNumber() + " - New Edition" 
 					: 
 						edition.getTitle() + " Nº " + edition.getNumber()
 			);
 			txt.setTag(edition);
+			layoutCover.addView(txt);
 			layoutMain.addView(layoutCover);			
 		}
 	}
@@ -127,7 +136,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			Edition edition = null;
 			if (v.getTag() != null && v.getTag() instanceof LinearLayout) {
 				LinearLayout layoutCoverImage = (LinearLayout)v.getTag();
-				TextView txt = (TextView)layoutCoverImage.findViewById(R.cover.txt);
+				TextView txt = (TextView)layoutCoverImage.findViewById(txt_id);
 				if (txt.getTag() != null && txt.getTag() instanceof Edition) {
 					edition = (Edition)txt.getTag();	
 				}	
@@ -193,8 +202,8 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					String url = (String)coverImage;
 					if (jakerApp.isConnected()) {
 						InputStream in = Utils.doGet(url);
-						String fileName = url.substring(url.lastIndexOf('/'), url.length());
-						Utils.write(in, new File(jakerApp.getCacheDir(), fileName));
+						String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
+						Utils.write(in, new File(jakerApp.getCachePath(), fileName));
 						return BitmapFactory.decodeStream(in);
 					}
 				}
@@ -237,7 +246,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		protected void onPreExecute() {
 			progressDialog = new ProgressDialog(EditionsActivity.this);
 			progressDialog.setTitle(jakerApp.getAppName());
-			progressDialog.setMessage("Downloading edition number " + edition.getNumber() + ".");
+			progressDialog.setMessage("Downloading file.");
 			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);			
 			if (progressDialog != null) {
 				if (cancelable) {
@@ -380,7 +389,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			if (book != null) {				
 				if (target.getTag() != null && target.getTag() instanceof LinearLayout) {
 					LinearLayout layoutCoverImage = (LinearLayout)target.getTag();
-					TextView txt = (TextView)layoutCoverImage.findViewById(R.cover.txt);
+					TextView txt = (TextView)layoutCoverImage.findViewById(txt_id);
 					if (txt.getTag() != null && txt.getTag() instanceof Edition) {
 						txt.setText(edition.getTitle() + " Nº " + edition.getNumber());
 						txt.setTag(book);							
