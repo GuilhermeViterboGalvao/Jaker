@@ -9,22 +9,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
-
 import br.com.jaker.view.R;
-
 import br.com.jaker.control.JSONBookParser;
 import br.com.jaker.exception.BookExpection;
 import br.com.jaker.model.Book;
 import br.com.jaker.model.Edition;
 import br.com.jaker.util.Messages;
 import br.com.jaker.util.Utils;
-
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -40,7 +35,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -83,7 +77,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			ImageView img = (ImageView)layoutCover.findViewById(R.cover.img);
 			img.setLayoutParams(new LayoutParams(25, 50));
 			img.setOnClickListener(this);
-			img.setTag(edition);
+			img.setTag(layoutCover);
 			String coverImage = edition.getCoverImage();
 			if (coverImage != null && !coverImage.equals("")) {
 				String fileName = coverImage.substring(coverImage.lastIndexOf('/'), coverImage.length());
@@ -103,6 +97,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					: 
 						edition.getTitle() + " Nº " + edition.getNumber()
 			);
+			txt.setTag(edition);
 			layoutMain.addView(layoutCover);			
 		}
 	}
@@ -130,15 +125,15 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	public void onClick(View v) {
 		if (v instanceof ImageView) {
 			Edition edition = null;
-			if (v.getTag() != null && v.getTag() instanceof Edition) {
-				edition = (Edition)v.getTag();			
+			if (v.getTag() != null && v.getTag() instanceof LinearLayout) {
+				LinearLayout layoutCoverImage = (LinearLayout)v.getTag();
+				TextView txt = (TextView)layoutCoverImage.findViewById(R.cover.txt);
+				if (txt.getTag() != null && txt.getTag() instanceof Edition) {
+					edition = (Edition)txt.getTag();	
+				}	
 			}
 			if (edition != null && edition.isNewEdition()) {
-				ProgressDialog progressDialog = new ProgressDialog(this);
-				progressDialog.setTitle(jakerApp.getAppName());
-				progressDialog.setMessage("Downloading edition number " + edition.getNumber() + ".");
-				progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				AsyncEditionZipDownloader editionDownloader = new AsyncEditionZipDownloader(progressDialog, (Button)v, true);
+				AsyncEditionZipDownloader editionDownloader = new AsyncEditionZipDownloader((ImageView)v);
 				editionDownloader.execute(edition);
 				editionsDownloader.add(editionDownloader);
 			} else {
@@ -220,9 +215,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	public class AsyncEditionZipDownloader extends AsyncTask<Edition, Integer, Book> {
 
-		public AsyncEditionZipDownloader(ProgressDialog progressDialog, Button target, boolean cancelable) {
-			this.progressDialog = progressDialog;
-			this.cancelable = cancelable;
+		public AsyncEditionZipDownloader(ImageView target) {
 			this.target = target;
 		}
 		
@@ -236,12 +229,16 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		
 		private String message;
 		
-		private Button target;
+		private ImageView target;
 		
 		private File zip;
 		
 		@Override
 		protected void onPreExecute() {
+			progressDialog = new ProgressDialog(EditionsActivity.this);
+			progressDialog.setTitle(jakerApp.getAppName());
+			progressDialog.setMessage("Downloading edition number " + edition.getNumber() + ".");
+			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);			
 			if (progressDialog != null) {
 				if (cancelable) {
 					progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
@@ -381,8 +378,14 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		protected void onPostExecute(Book book) {
 			if (progressDialog.isShowing()) progressDialog.dismiss();
 			if (book != null) {				
-				target.setText(edition.getTitle() + " Nº " + edition.getNumber());
-				target.setTag(book);
+				if (target.getTag() != null && target.getTag() instanceof LinearLayout) {
+					LinearLayout layoutCoverImage = (LinearLayout)target.getTag();
+					TextView txt = (TextView)layoutCoverImage.findViewById(R.cover.txt);
+					if (txt.getTag() != null && txt.getTag() instanceof Edition) {
+						txt.setText(edition.getTitle() + " Nº " + edition.getNumber());
+						txt.setTag(book);							
+					}	
+				}
 			} else {
 				alertDialog = new AlertDialog.Builder(EditionsActivity.this);
 				alertDialog.setTitle(jakerApp.getAppName());
