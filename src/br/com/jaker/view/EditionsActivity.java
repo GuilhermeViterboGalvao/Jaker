@@ -91,7 +91,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					downloadsCoversImages.add(downloadCoverImage);
 				}
 			}
-			TextView txt = (TextView)layoutCover.findViewById(R.cover.img);
+			TextView txt = (TextView)layoutCover.findViewById(R.cover.txt);
 			txt.setText(edition.isNewEdition() && !checkIfExists(edition) ? 
 						edition.getTitle() + " Nº " + edition.getNumber() + " - New Edition" 
 					: 
