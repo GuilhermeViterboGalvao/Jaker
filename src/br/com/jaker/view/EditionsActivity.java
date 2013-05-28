@@ -49,13 +49,15 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	private static final int img_id = 200;
 	
+	private boolean canBackPress = false;
+	
 	private JakerApp jakerApp;
 	
 	private LinearLayout layoutMain;
 	
 	private AlertDialog.Builder alertDialog;
 	
-	private List<AsyncEditionZipDownloader> editionsDownloader;
+	private AsyncEditionZipDownloader editionZipDownloader;
 	
 	private List<DownloadCoverImage> downloadsCoversImages;
 	
@@ -65,8 +67,6 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.editions);
 		
 		layoutMain = (LinearLayout)findViewById(R.editions.layoutMain);
-				
-		editionsDownloader = new ArrayList<AsyncEditionZipDownloader>();
 		
 		downloadsCoversImages = new ArrayList<DownloadCoverImage>();
 		
@@ -115,21 +115,48 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	@Override
 	public void finish() {
-		if (editionsDownloader != null) {
-			for (AsyncEditionZipDownloader bookDownloader : editionsDownloader) {
-				if (!bookDownloader.isCancelled()) {
-					bookDownloader.cancel(true);
-				}
-			}
+		if (editionZipDownloader != null && !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
+			editionZipDownloader.cancel(true);
 		}
 		if (downloadsCoversImages != null) {
 			for (DownloadCoverImage downloadCoverImage : downloadsCoversImages) {
-				if (!downloadCoverImage.isCancelled()) {
+				if (!downloadCoverImage.getStatus().equals(AsyncTask.Status.FINISHED)) {
 					downloadCoverImage.cancel(true);
 				}
 			}
 		}
 		super.finish();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if (editionZipDownloader != null 
+				&& !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)
+					&& !canBackPress) {
+			canBackPress = false;
+			alertDialog = new AlertDialog.Builder(this);
+			alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					canBackPress = true;
+					EditionsActivity.this.onBackPressed();
+					dialog.dismiss();
+				}
+			});
+			alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {				
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					canBackPress = false;
+					dialog.dismiss();
+				}
+			});
+			alertDialog.setTitle("Warning");
+			alertDialog.setMessage("There is a download issue in progress and you can exit the application it is necessary to shut it down,\nyou want to continue?");
+			alertDialog.create();
+			alertDialog.show();
+		} else {
+			super.onBackPressed();	
+		}	
 	}
 	
 	@Override
@@ -143,10 +170,11 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					edition = (Edition)txt.getTag();	
 				}	
 			}
-			if (edition != null && edition.isNewEdition()) {
-				AsyncEditionZipDownloader editionDownloader = new AsyncEditionZipDownloader((ImageView)v);
-				editionDownloader.execute(edition);
-				editionsDownloader.add(editionDownloader);
+			if (edition != null && edition.isNewEdition() && (editionZipDownloader == null || editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED))) {
+				editionZipDownloader = new AsyncEditionZipDownloader((ImageView)v);
+				editionZipDownloader.execute(edition);
+			} else if (editionZipDownloader != null && !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
+				editionZipDownloader.showProgressDialog();
 			} else {
 				startActivity(new Intent(this, JakerSliderPaginatorActivity.class).putExtra("book", edition.getBook()));				
 			}
@@ -228,6 +256,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 
 		public AsyncEditionZipDownloader(ImageView target) {
 			this.target = target;
+			EditionsActivity.this.canBackPress = false;
 		}
 		
 		private AlertDialog.Builder alertDialog;
@@ -376,6 +405,16 @@ public class EditionsActivity extends Activity implements OnClickListener {
 			if (values.length == 2) {
 				progressDialog.setMax(values[0]);
 				progressDialog.setProgress(values[1]);
+			}
+		}
+		
+		public boolean isShowingProgressDialog() {
+			return progressDialog != null ? progressDialog.isShowing() : false;
+		}
+		
+		public void showProgressDialog() {
+			if (progressDialog != null && !progressDialog.isShowing()) {
+				progressDialog.show();
 			}
 		}
 		

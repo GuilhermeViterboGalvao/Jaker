@@ -84,7 +84,9 @@ public class SplashActivity extends Activity {
 	
 	@Override
 	public void finish() {
-		if (editionsDownloader != null && !editionsDownloader.isCancelled()) editionsDownloader.cancel(true);
+		if (editionsDownloader != null && !editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
+			editionsDownloader.cancel(true);
+		}
 		super.finish();
 	}
 	
