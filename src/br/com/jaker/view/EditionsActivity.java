@@ -433,7 +433,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					TextView txt = (TextView)layoutCoverImage.findViewById(txt_id);
 					if (txt.getTag() != null && txt.getTag() instanceof Edition) {
 						txt.setText(edition.getTitle() + " Nº " + edition.getNumber());
-						txt.setTag(book);							
+						txt.setTag(edition);							
 					}	
 				}
 			} else {
