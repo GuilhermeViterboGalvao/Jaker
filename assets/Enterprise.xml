@@ -2,7 +2,18 @@
 <enterprise>
 	<name>Jaker</name>
 	<site>http://fluir.terra.com.br/</site>
-	<urlJsonEdtions>http://waves.terra.com.br/fluir/editions.xml</urlJsonEdtions>
-	<address country="" state="" city="" neighborhood="" street="" code="" others=""/>
-	<manager name="" email=""/>
+	<urlEdtions>http://waves.terra.com.br/fluir/editions.xml</urlEdtions>
+	<address 
+	    country="Brazil" 
+	    state="SP" 
+	    city="Santos" 
+	    neighborhood="Ponta-da-Praia" 
+	    street="Rua República do Equador" 
+	    code="116" 
+	    others="casa 53"
+	/>
+	<manager 
+	    name="Guilherme V. Galvão" 
+	    email="catanduva.gvg@gmail.com"
+	/>
 </enterprise>
