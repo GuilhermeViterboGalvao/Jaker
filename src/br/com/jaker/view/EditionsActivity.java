@@ -175,7 +175,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 				editionZipDownloader.execute(edition);
 			} else if (editionZipDownloader != null && !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
 				editionZipDownloader.showProgressDialog();
-			} else {
+			} else if (edition != null && edition.getBook() != null) {
 				startActivity(new Intent(this, JakerSliderPaginatorActivity.class).putExtra("book", edition.getBook()));				
 			}
 		}
