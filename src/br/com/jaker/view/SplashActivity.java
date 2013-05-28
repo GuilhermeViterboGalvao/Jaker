@@ -169,6 +169,7 @@ public class SplashActivity extends Activity {
 			} else {
 				showAlertDialog();
 			}
+			SplashActivity.this.finish();
 		}
 		
 		private void showAlertDialog() {
