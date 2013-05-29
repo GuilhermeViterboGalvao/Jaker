@@ -383,6 +383,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 						book = JSONBookParser.parseBook(new FileInputStream(new File(jakerApp.getRootPath(), edition.getNumber() + "/book.json")));
 						book.setEdition(edition);
 						edition.setBook(book);
+						edition.setNewEdition(false);
 					} catch (Exception e) {
 						message = Messages.problemOnReadJsonBookFile;
 						Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);
@@ -432,8 +433,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					LinearLayout layoutCoverImage = (LinearLayout)target.getTag();
 					TextView txt = (TextView)layoutCoverImage.findViewById(txt_id);
 					if (txt.getTag() != null && txt.getTag() instanceof Edition) {
-						txt.setText(edition.getTitle() + " Nº " + edition.getNumber());
-						txt.setTag(edition);							
+						txt.setText(edition.getTitle() + " Nº " + edition.getNumber());						
 					}	
 				}
 			} else {
