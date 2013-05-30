@@ -149,7 +149,7 @@ public class SplashActivity extends Activity {
 				} finally {
 					if (in  != null) try { in.close();               } catch (Exception e) { }
 					if (out != null) try { out.flush(); out.close(); } catch (Exception e) { }
-					if (editions == null && errorMessage != null && errorMessage.equals("")) errorMessage = "The " + jakerApp.getAppName() + " can't read editions.xml or download it!";
+					if (editions == null && (errorMessage == null || errorMessage.equals(""))) errorMessage = "The " + jakerApp.getAppName() + " can't read editions.xml or download it!";
 				}	
 	        }
 	        
@@ -168,10 +168,10 @@ public class SplashActivity extends Activity {
 			if (editions != null) {
 				jakerApp.setEditions(editions);				
 				startActivity(new Intent(SplashActivity.this, EditionsActivity.class));
+				SplashActivity.this.finish();
 			} else {
 				showAlertDialog();
-			}
-			SplashActivity.this.finish();
+			}			
 		}
 		
 		private void showAlertDialog() {
