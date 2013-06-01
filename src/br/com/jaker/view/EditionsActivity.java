@@ -233,7 +233,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					if (jakerApp.isConnected()) {
 						InputStream in = Utils.doGet(url);
 						String fileName = url.substring(url.lastIndexOf('/') + 1, url.length());
-						File imageCover = new File(jakerApp.getCachePath(), fileName); 
+						File imageCover = new File(jakerApp.getCachePath(), fileName);
 						Utils.write(in, imageCover);
 						try { if(in != null) in.close(); } catch (Exception e) { }
 						return BitmapFactory.decodeFile(imageCover.getAbsolutePath());

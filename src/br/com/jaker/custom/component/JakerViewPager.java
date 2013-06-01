@@ -21,6 +21,6 @@ public class JakerViewPager extends ViewPager {
 	
 	@Override
 	public boolean onInterceptTouchEvent(MotionEvent event) {
-		return false;
+	    return false;
 	}
 }

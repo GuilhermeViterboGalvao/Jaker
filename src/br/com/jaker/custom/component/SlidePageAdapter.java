@@ -3,12 +3,8 @@ package br.com.jaker.custom.component;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-
 import br.com.jaker.model.Book;
 import br.com.jaker.view.JakerApp;
-
-
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

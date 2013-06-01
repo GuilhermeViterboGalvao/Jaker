@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 
 /**
@@ -19,9 +18,9 @@ import android.widget.LinearLayout;
 @SuppressLint("SetJavaScriptEnabled")
 public class JakerFragment extends Fragment {
 	
-	private WebView webView;
+	private JakerWebView webView;
 	
-	public WebView getWebView() {
+	public JakerWebView getWebView() {
 		return webView;
 	}
 	
@@ -34,7 +33,7 @@ public class JakerFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		LinearLayout fragmentWebView = (LinearLayout)inflater.inflate(R.layout.fragment_webview, container, false);
-		webView = (WebView)fragmentWebView.findViewById(R.fragmentWebView.webView);
+		webView = (JakerWebView)fragmentWebView.findViewById(R.fragmentWebView.webView);
 		webView.setWebViewClient(new JakerBrowser());
         webView.getSettings().setSupportZoom(true);
         webView.getSettings().setPluginsEnabled(true);

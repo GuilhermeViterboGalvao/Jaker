@@ -8,11 +8,10 @@ import android.webkit.WebViewClient;
  * @email catanduva.gvg@gmail.com
  * */
 public class JakerBrowser extends WebViewClient {
-
+	
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
         view.loadUrl(url);
         return true;
-    }
-	
+    }	
 }
