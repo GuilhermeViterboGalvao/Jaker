@@ -10,7 +10,7 @@ import android.webkit.WebView;
 public class JakerWebView extends WebView {
 
 	public JakerWebView(Context context, AttributeSet attrs, int defStyle, boolean privateBrowsing) {
-		super(context, attrs, defStyle, privateBrowsing);
+		super(context, attrs, defStyle);
 	}
 
 	public JakerWebView(Context context, AttributeSet attrs, int defStyle) {
