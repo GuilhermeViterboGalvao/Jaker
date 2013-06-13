@@ -22,7 +22,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 
 /**
@@ -60,10 +59,6 @@ public class SplashActivity extends Activity {
 		
 		if (readEnterpriseXML) {
 			jakerApp.setAppName(jakerApp.getEnterprise().getName() != null && !jakerApp.getEnterprise().getName().equals("") ? jakerApp.getEnterprise().getName() : "Jaker");
-			
-			File rootPath = new File(Environment.getExternalStorageDirectory(), jakerApp.getAppName());
-			if (!rootPath.exists()) rootPath.mkdirs();
-			jakerApp.setRootPath(rootPath);
 			
 			editionsDownloader = new AsyncEditionsDownloader();
 			editionsDownloader.execute(jakerApp.getEnterprise().getUrlJsonEdtions());

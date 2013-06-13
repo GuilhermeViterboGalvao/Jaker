@@ -39,8 +39,6 @@ public class EditionsDownloader {
 	
 	private String message;
 	
-	private JakerApp app;
-	
 	private File zip;
 	
 	public EditionsDownloader(final JakerApp app, final ImageView target) {
@@ -51,8 +49,8 @@ public class EditionsDownloader {
 			
 			@Override
 			protected void onPreExecute() {
-				progressDialog = new ProgressDialog(EditionsDownloader.this.app.getApplicationContext());
-				progressDialog.setTitle(EditionsDownloader.this.app.getAppName());
+				progressDialog = new ProgressDialog(app.getApplicationContext());
+				progressDialog.setTitle(app.getAppName());
 				progressDialog.setMessage("Downloading file.");
 				progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);			
 				if (progressDialog != null) {
@@ -103,12 +101,12 @@ public class EditionsDownloader {
 			        
 			        InputStream in   = null;
 			        OutputStream out = null;
-			        zip = new File(EditionsDownloader.this.app.getRootPath(), edition.getNumber() + ".zip");
+			        zip = new File(app.getRootPath(), edition.getNumber() + ".zip");
 			        
 			        try {			        	
 			            in  = response.getEntity().getContent();			            
 			            out = new FileOutputStream(zip);			            
-			            while ( ((read = in.read(buffer)) != -1) && !isCancelled() && EditionsDownloader.this.app.isConnected()) {
+			            while ( ((read = in.read(buffer)) != -1) && !isCancelled() && app.isConnected()) {
 			            	totalRead += read;     
 			                out.write(buffer, 0, read);
 			                publishProgress(100, (int)(totalRead * 100 / fileSize));
@@ -124,7 +122,7 @@ public class EditionsDownloader {
 			        
 			        if (zip != null && zip.exists() && zip.length() == fileSize) {
 						try {
-							Utils.unzip(zip, EditionsDownloader.this.app.getRootPath());						
+							Utils.unzip(zip, app.getRootPath());						
 						} catch (Exception e) {
 							message = Messages.problemOnUnzipFile;
 							Log.e("EditionsDownloader.task.doInBackground", e.getMessage(), e);
@@ -137,7 +135,7 @@ public class EditionsDownloader {
 							book = JSONBookParser.parseBook(
 									new FileInputStream(
 											new File(
-													EditionsDownloader.this.app.getRootPath(), 
+													app.getRootPath(), 
 													edition.getNumber() + "/book.json"
 											)
 									)
@@ -153,7 +151,7 @@ public class EditionsDownloader {
 						
 						return book;
 			        } else {
-			        	if (!EditionsDownloader.this.app.isConnected()) message = Messages.internetConnectionProblem;
+			        	if (!app.isConnected()) message = Messages.internetConnectionProblem;
 			        }
 				} else {
 					message = Messages.editionIsNull;
@@ -194,8 +192,8 @@ public class EditionsDownloader {
 						}	
 					}
 				} else {
-					alertDialog = new AlertDialog.Builder(EditionsDownloader.this.app.getApplicationContext());
-					alertDialog.setTitle(EditionsDownloader.this.app.getAppName());
+					alertDialog = new AlertDialog.Builder(app.getApplicationContext());
+					alertDialog.setTitle(app.getAppName());
 					alertDialog.setMessage(message);
 					alertDialog.create();
 					alertDialog.show();

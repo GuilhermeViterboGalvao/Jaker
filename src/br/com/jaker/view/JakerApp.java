@@ -48,10 +48,6 @@ public class JakerApp extends Application {
 	
 	private File rootPath;
 	
-	public void setRootPath(File rootPath) {
-		this.rootPath = rootPath;		
-	}
-	
 	public File getRootPath() {
 		return rootPath;
 	}
@@ -73,7 +69,8 @@ public class JakerApp extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		connectivityManager = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);		
+		rootPath = getApplicationContext().getDir("Jaker", Application.MODE_PRIVATE);
 	}
 	
 	public synchronized boolean isConnected(){
