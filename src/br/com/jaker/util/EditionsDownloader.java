@@ -55,7 +55,7 @@ public class EditionsDownloader {
 				progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						cancel(true);					
+						cancel(true);				
 					}
 				});
 				progressDialog.show();
@@ -104,7 +104,7 @@ public class EditionsDownloader {
 			            while ( ((read = in.read(buffer)) != -1) && !isCancelled() && app.isConnected()) {
 			            	totalRead += read;     
 			                out.write(buffer, 0, read);
-			                publishProgress(100, (int)(totalRead * 100 / fileSize));
+			                publishProgress(100, (int)(totalRead * 100 / fileSize));			                
 			            }
 					} catch (Exception e) {
 						Log.e("EditionsDownloader.task.doInBackground", e.getMessage(), e);						
@@ -215,6 +215,10 @@ public class EditionsDownloader {
 	
 	public boolean cancel() {
 		return task.cancel(true);
+	}
+	
+	public final boolean isCancelled() {
+		return task.isCancelled();
 	}
 	
 	public final Status getStatus() {
