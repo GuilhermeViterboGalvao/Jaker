@@ -161,8 +161,9 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					edition = (Edition)txt.getTag();	
 				}	
 			}
+			//TODO When download dont stpping at the moment.
 			if (edition != null && edition.isNewEdition() && (editionsDownloader == null || editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED))) {
-				editionsDownloader = new EditionsDownloader(jakerApp, (ImageView)v);
+				editionsDownloader = new EditionsDownloader(jakerApp, (ImageView)v, this);
 				editionsDownloader.execute(edition);
 			} else if (editionsDownloader != null && !editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
 				editionsDownloader.showProgressDialog();

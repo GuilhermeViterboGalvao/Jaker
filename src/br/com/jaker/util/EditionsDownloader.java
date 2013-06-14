@@ -15,6 +15,7 @@ import br.com.jaker.view.EditionsActivity;
 import br.com.jaker.view.JakerApp;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.AsyncTask.Status;
@@ -34,14 +35,12 @@ public class EditionsDownloader {
 	private AlertDialog.Builder alertDialog;
 	
 	private ProgressDialog progressDialog;
-		
-	private boolean cancelable;
 	
 	private String message;
 	
 	private File zip;
 	
-	public EditionsDownloader(final JakerApp app, final ImageView target) {
+	public EditionsDownloader(final JakerApp app, final ImageView target, final Context activityContext) {
 		this.message = null;
 		this.task    = new AsyncTask<Edition, Integer, Book>() {
 			
@@ -49,21 +48,17 @@ public class EditionsDownloader {
 			
 			@Override
 			protected void onPreExecute() {
-				progressDialog = new ProgressDialog(app.getApplicationContext());
+				progressDialog = new ProgressDialog(activityContext);
 				progressDialog.setTitle(app.getAppName());
-				progressDialog.setMessage("Downloading file.");
+				progressDialog.setMessage("Downloading file...");
 				progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);			
-				if (progressDialog != null) {
-					if (cancelable) {
-						progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								if (EditionsDownloader.this.task.isCancelled()) EditionsDownloader.this.task.cancel(true);
-							}
-						});	
-					} 
-					progressDialog.show();
-				}				
+				progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						cancel(true);					
+					}
+				});
+				progressDialog.show();
 			}
 			
 			@Override
@@ -152,6 +147,7 @@ public class EditionsDownloader {
 						return book;
 			        } else {
 			        	if (!app.isConnected()) message = Messages.internetConnectionProblem;
+			        	if (zip != null) zip.delete();
 			        }
 				} else {
 					message = Messages.editionIsNull;
@@ -192,7 +188,7 @@ public class EditionsDownloader {
 						}	
 					}
 				} else {
-					alertDialog = new AlertDialog.Builder(app.getApplicationContext());
+					alertDialog = new AlertDialog.Builder(activityContext);
 					alertDialog.setTitle(app.getAppName());
 					alertDialog.setMessage(message);
 					alertDialog.create();
