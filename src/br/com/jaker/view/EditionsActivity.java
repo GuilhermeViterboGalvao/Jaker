@@ -3,26 +3,18 @@ package br.com.jaker.view;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
 import br.com.jaker.view.R;
 import br.com.jaker.control.JSONBookParser;
 import br.com.jaker.exception.BookExpection;
 import br.com.jaker.model.Book;
 import br.com.jaker.model.Edition;
-import br.com.jaker.util.Messages;
+import br.com.jaker.util.EditionsDownloader;
 import br.com.jaker.util.Utils;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -30,7 +22,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -45,9 +36,9 @@ import android.widget.TextView;
  * */
 public class EditionsActivity extends Activity implements OnClickListener {
 
-	private static final int txt_id = 100;
+	public static final int txt_id = 100;
 	
-	private static final int img_id = 200;
+	public static final int img_id = 200;
 	
 	private boolean canBackPress = false;
 	
@@ -57,7 +48,7 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	private AlertDialog.Builder alertDialog;
 	
-	private AsyncEditionZipDownloader editionZipDownloader;
+	private EditionsDownloader editionsDownloader;
 	
 	private List<DownloadCoverImage> downloadsCoversImages;
 	
@@ -115,8 +106,8 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	@Override
 	public void finish() {
-		if (editionZipDownloader != null && !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
-			editionZipDownloader.cancel(true);
+		if (editionsDownloader != null && !editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
+			editionsDownloader.cancel();
 		}
 		if (downloadsCoversImages != null) {
 			for (DownloadCoverImage downloadCoverImage : downloadsCoversImages) {
@@ -130,8 +121,8 @@ public class EditionsActivity extends Activity implements OnClickListener {
 	
 	@Override
 	public void onBackPressed() {
-		if (editionZipDownloader != null 
-				&& !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)
+		if (editionsDownloader != null 
+				&& !editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED)
 					&& !canBackPress) {
 			canBackPress = false;
 			alertDialog = new AlertDialog.Builder(this);
@@ -170,11 +161,12 @@ public class EditionsActivity extends Activity implements OnClickListener {
 					edition = (Edition)txt.getTag();	
 				}	
 			}
-			if (edition != null && edition.isNewEdition() && (editionZipDownloader == null || editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED))) {
-				editionZipDownloader = new AsyncEditionZipDownloader((ImageView)v);
-				editionZipDownloader.execute(edition);
-			} else if (editionZipDownloader != null && !editionZipDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
-				editionZipDownloader.showProgressDialog();
+
+			if (edition != null && edition.isNewEdition() && (editionsDownloader == null || editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED) || editionsDownloader.isCancelled())) {
+				editionsDownloader = new EditionsDownloader(jakerApp, (ImageView)v, this);
+				editionsDownloader.execute(edition);
+			} else if (editionsDownloader != null && !editionsDownloader.getStatus().equals(AsyncTask.Status.FINISHED)) {
+				editionsDownloader.showProgressDialog();
 			} else if (edition != null && edition.getBook() != null) {
 				startActivity(new Intent(this, JakerSliderPaginatorActivity.class).putExtra("book", edition.getBook()));				
 			}
@@ -254,197 +246,4 @@ public class EditionsActivity extends Activity implements OnClickListener {
 		
 	}//DownloadCoverImage
 	
-	public class AsyncEditionZipDownloader extends AsyncTask<Edition, Integer, Book> {
-
-		public AsyncEditionZipDownloader(ImageView target) {
-			this.target = target;
-			EditionsActivity.this.canBackPress = false;
-		}
-		
-		private AlertDialog.Builder alertDialog;
-		
-		private ProgressDialog progressDialog;		
-		
-		private boolean cancelable;
-		
-		private Edition edition;
-		
-		private String message;
-		
-		private ImageView target;
-		
-		private File zip;
-		
-		@Override
-		protected void onPreExecute() {
-			progressDialog = new ProgressDialog(EditionsActivity.this);
-			progressDialog.setTitle(jakerApp.getAppName());
-			progressDialog.setMessage("Downloading file.");
-			progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);			
-			if (progressDialog != null) {
-				if (cancelable) {
-					progressDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cancel", new DialogInterface.OnClickListener() {					
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if (AsyncEditionZipDownloader.this.isCancelled()) AsyncEditionZipDownloader.this.cancel(true);
-						}
-					});	
-				} 
-				progressDialog.show();
-			}
-		}
-		
-		@Override
-		protected Book doInBackground(Edition... editions) {
-			edition = editions[0];
-			
-			if (edition != null && target != null && progressDialog != null) {	
-				HttpGet requestGet = new HttpGet(edition.getDownloadUrl());
-				requestGet.setHeader("Accept", "text/plain");
-				
-				HttpResponse response = null;
-				
-				try {
-					response = Utils.getHTTPClient().execute(requestGet);
-				} catch (ClientProtocolException cpe) {
-					message = Messages.problemConnectingToTheServer;
-					Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Execution stoped: " + cpe.getMessage());
-					return null;
-				} catch (IOException ioe) {
-					message = Messages.problemConnectingToTheServer;
-					Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Execution stoped: " + ioe.getMessage());
-					return null;
-				} catch (Exception e) {
-					message = Messages.problemConnectingToTheServer;
-					Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Execution stoped: " + e.getMessage());
-					return null;
-				}
-				
-				int statusCode = response.getStatusLine().getStatusCode();
-				
-				if (statusCode != HttpStatus.SC_OK) {
-					try {
-						response.getEntity().getContent().close();
-					} catch (IOException ioe) {						
-						Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + ioe.getMessage());
-					} catch (Exception e) {
-						Log.i("EditionsActivity.AsyncEditionZipDownloader.doInBackground", "Error on close InputStream (response.getEntity().getContent().close()): " + e.getMessage());
-					}
-					message = Messages.serverReturnStats + Integer.toString(statusCode);
-					return null;
-				}
-				
-				long fileSize  = response.getEntity().getContentLength();
-		        long totalRead = 0;        
-		        int read = 0;
-		        byte buffer[] = new byte[1024];
-		        InputStream in = null;
-		        OutputStream out = null;
-		        zip = new File(jakerApp.getRootPath(), edition.getNumber() + ".zip");
-		        
-				try {
-					
-		            in  = response.getEntity().getContent();
-		            out = new FileOutputStream(zip);
-		            
-		            while ( ((read = in.read(buffer)) != -1) && !isCancelled() && jakerApp.isConnected()) {
-		            	totalRead += read;                
-		                out.write(buffer, 0, read);
-		                publishProgress(100, (int)(totalRead * 100 / fileSize));
-		            }
-		            
-				} catch (IllegalStateException ise) {
-					if (zip != null && zip.exists())zip.delete();
-					message = Messages.problemToDownloadTheFile;
-					Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", ise.getMessage(), ise);
-				} catch (IOException ioe) {
-					if (zip != null && zip.exists())zip.delete();
-					message = Messages.problemToDownloadTheFile;
-					Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", ioe.getMessage(), ioe);
-				} catch (Exception e) {
-					if (zip != null && zip.exists())zip.delete();
-					message = Messages.problemToDownloadTheFile;
-					Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);					
-				} finally {
-					if(in  != null) try { in.close();  } catch (Exception e) {}
-					if(out != null) try { out.close(); } catch (Exception e) {}
-				}
-				
-				if (zip != null && zip.exists() && zip.length() == fileSize) {
-					try {
-						Utils.unzip(zip, jakerApp.getRootPath());						
-					} catch (Exception e) {
-						message = Messages.problemOnUnzipFile;
-						Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);
-					}
-					
-					zip.delete();
-					Book book = null;
-					
-					try {
-						book = JSONBookParser.parseBook(new FileInputStream(new File(jakerApp.getRootPath(), edition.getNumber() + "/book.json")));
-						book.setEdition(edition);
-						edition.setBook(book);
-						edition.setNewEdition(false);
-					} catch (Exception e) {
-						message = Messages.problemOnReadJsonBookFile;
-						Log.e("EditionsActivity.AsyncEditionZipDownloader.doInBackground", e.getMessage(), e);
-					}
-					
-					return book;
-				} else {
-					if (!jakerApp.isConnected()) message = Messages.internetConnectionProblem;
-				}
-			} else {
-				if (edition == null) 		     message = Messages.editionIsNull;
-				else if (progressDialog == null) message = Messages.progressBarIsNull;
-				else if (target == null) 	     message = Messages.targetIsNull;
-			}
-			return null;
-		}
-		
-		@Override
-		protected void onProgressUpdate(Integer... values) {
-			if (values.length == 2) {
-				progressDialog.setMax(values[0]);
-				progressDialog.setProgress(values[1]);
-			}
-		}
-		
-		public boolean isShowingProgressDialog() {
-			return progressDialog != null ? progressDialog.isShowing() : false;
-		}
-		
-		public void showProgressDialog() {
-			if (progressDialog != null && !progressDialog.isShowing()) {
-				progressDialog.show();
-			}
-		}
-		
-		@Override
-		protected void onCancelled() {
-			if (isCancelled() && zip != null && zip.exists()) zip.delete();
-			if (progressDialog.isShowing()) progressDialog.dismiss();
-		}
-		
-		@Override
-		protected void onPostExecute(Book book) {
-			if (progressDialog.isShowing()) progressDialog.dismiss();
-			if (book != null) {				
-				if (target.getTag() != null && target.getTag() instanceof LinearLayout) {
-					LinearLayout layoutCoverImage = (LinearLayout)target.getTag();
-					TextView txt = (TextView)layoutCoverImage.findViewById(txt_id);
-					if (txt.getTag() != null && txt.getTag() instanceof Edition) {
-						txt.setText(edition.getTitle() + " Nº " + edition.getNumber());						
-					}	
-				}
-			} else {
-				alertDialog = new AlertDialog.Builder(EditionsActivity.this);
-				alertDialog.setTitle(jakerApp.getAppName());
-				alertDialog.setMessage(message);
-				alertDialog.create();
-				alertDialog.show();
-			}
-		}
-	}//AsyncEditionZipDownloader
 }//EditionsActivity

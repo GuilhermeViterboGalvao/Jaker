@@ -1,6 +1,7 @@
 package br.com.jaker.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -316,5 +317,16 @@ public final class Utils {
 		} finally {
 			if (zip != null) try { zip.close(); } catch (Exception e) { }
 		}
+	}
+	
+	public static void delete(File f) throws IOException {
+		if (f.isDirectory()) {
+			for (File c : f.listFiles()) {
+				delete(c);
+			}			      
+		}
+		if (!f.delete()) {
+			throw new FileNotFoundException("Failed to delete file: " + f);  
+		}		    
 	}
 }
